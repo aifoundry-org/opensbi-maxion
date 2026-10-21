@@ -22,6 +22,7 @@ COPIES = {
     "PROVENANCE.json": "et/PROVENANCE.json",
     "COPYING.BSD": "COPYING.BSD",
     "ThirdPartyNotices.md": "ThirdPartyNotices.md",
+    "OPENSBI-BINARY-NOTICES.txt": "et/licenses/OPENSBI-BINARY-NOTICES.txt",
     "et-platform-LICENSE": "et/licenses/et-platform-LICENSE",
     "et-platform-NOTICE": "et/licenses/et-platform-NOTICE",
 }

@@ -18,7 +18,7 @@ No progress-marker instrumentation is applied to that tree.
 
 The release workflow adds only `.github/workflows/maxion-release.yml` outside
 `et/`, changing the current enforced non-`et/` tree to
-`0b556df7b313bf5627054c3fe88095c1d97e846b`.
+`e1b04052bd6a5093d5abf9e1279f168974899f7d`.
 No firmware source files change. Both identities are retained in
 `et/PROVENANCE.json`; historical receipts keep their original source trees.
 

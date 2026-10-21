@@ -51,6 +51,7 @@ jobs:
       - name: Verify inputs and run offline controls
         run: |
           mkdir -p et/build
+          python3 et/ci/binary-notices.py --check
           python3 et/build.py --verify-only > et/build/input-verification.log
           python3 -m unittest discover -s et/tests -p 'test_*.py' -v 2>&1 | tee et/build/unit-tests.log
 
@@ -72,6 +73,7 @@ jobs:
           path: et/build/release-assets/
           if-no-files-found: error
           retention-days: 14
+          overwrite: true # Replace only temporary same-run artifacts on a rerun.
 
       - name: Retain diagnostic logs, including failed builds
         if: always()
@@ -86,6 +88,7 @@ jobs:
             et/build/release-build/fw_jump.readelf.txt
           if-no-files-found: ignore
           retention-days: 14
+          overwrite: true
 
   publish:
     needs: build

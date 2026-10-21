@@ -34,6 +34,7 @@ gh release create "$tag" --verify-tag --draft --title "$tag" \
     "$assets/fw_jump.readelf.txt" "$assets/toolchain.json" \
     "$assets/PROVENANCE.json" "$assets/COPYING.BSD" \
     "$assets/ThirdPartyNotices.md" \
+    "$assets/OPENSBI-BINARY-NOTICES.txt" \
     "$assets/et-platform-LICENSE" "$assets/et-platform-NOTICE" \
     "$assets/release.json" "$assets/SHA256SUMS" "$assets/RELEASE-NOTES.md"
 check_remote_tag

@@ -2,7 +2,7 @@
   "upstream_repository": "https://github.com/riscv-software-src/opensbi.git",
   "upstream_commit": "6ad246a1494807ee91e36ffcf60e4c30bb309d45",
   "upstream_tree": "55a808af978e000950dcb01e6cf0fc87b71a641f",
-  "production_source_tree_without_et": "0b556df7b313bf5627054c3fe88095c1d97e846b",
+  "production_source_tree_without_et": "e1b04052bd6a5093d5abf9e1279f168974899f7d",
   "required_patch_commits": [
     "c50ce7a2",
     "ba6cec97"
