@@ -2,7 +2,7 @@
   "upstream_repository": "https://github.com/riscv-software-src/opensbi.git",
   "upstream_commit": "6ad246a1494807ee91e36ffcf60e4c30bb309d45",
   "upstream_tree": "55a808af978e000950dcb01e6cf0fc87b71a641f",
-  "production_source_tree_without_et": "f048c30f926905c34497da4665a14c2d2d5e564b",
+  "production_source_tree_without_et": "0b556df7b313bf5627054c3fe88095c1d97e846b",
   "required_patch_commits": [
     "c50ce7a2",
     "ba6cec97"
@@ -70,5 +70,7 @@
       "imported_path": "et/history/portable-VALIDATION.md.txt",
       "sha256": "59c7089da6e7a9e9a1aa124d86b7078a527f5796eda5c501e81b44cf4fec127b"
     }
-  ]
+  ],
+  "patched_upstream_tree_before_release_workflow": "f048c30f926905c34497da4665a14c2d2d5e564b",
+  "source_tree_note": "The strict non-et tree adds only .github/workflows/maxion-release.yml to the original two-patch upstream tree; firmware source files are unchanged."
 }

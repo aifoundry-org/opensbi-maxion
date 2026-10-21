@@ -149,6 +149,7 @@ work as if it were an OpenSBI patch.
 
 ## Validation and operating boundary
 
+- [Tag-triggered GitHub build and release workflow](docs/RELEASES.md)
 - [Validation records](VALIDATION.md)
 - [Linux/9front binary identity evidence](docs/LINUX-IDENTITY.md)
 - [Provenance and licenses](docs/PROVENANCE.md)

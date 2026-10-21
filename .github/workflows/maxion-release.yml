@@ -1,0 +1,115 @@
+name: Maxion firmware release
+
+on:
+  push:
+    tags:
+      - 'maxion-v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maxion-release-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  RELEASE_TAG: ${{ github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the exact tag event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate release tag and committed support files
+        run: |
+          python3 -c 'import os,re; assert re.fullmatch(r"maxion-v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)", os.environ["RELEASE_TAG"]), "expected maxion-vMAJOR.MINOR.PATCH"'
+          test "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")" = "$(git rev-parse HEAD)"
+          sha256sum -c et/SHA256SUMS
+
+      - name: Install the exact reference cross-toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends --allow-downgrades \
+            git make python3 \
+            gcc-riscv64-linux-gnu=4:11.2.0--1ubuntu1 \
+            cpp-riscv64-linux-gnu=4:11.2.0--1ubuntu1 \
+            gcc-11-riscv64-linux-gnu=11.4.0-1ubuntu1~22.04cross1 \
+            cpp-11-riscv64-linux-gnu=11.4.0-1ubuntu1~22.04cross1 \
+            binutils-riscv64-linux-gnu=2.38-4ubuntu2.12
+
+      - name: Verify inputs and run offline controls
+        run: |
+          mkdir -p et/build
+          python3 et/build.py --verify-only > et/build/input-verification.log
+          python3 -m unittest discover -s et/tests -p 'test_*.py' -v 2>&1 | tee et/build/unit-tests.log
+
+      - name: Compile and require the historical firmware bytes
+        run: |
+          python3 et/build.py --out "$PWD/et/build/release-build" --jobs 2
+          cmp et/reference/fw_jump.bin et/build/release-build/fw_jump.bin
+
+      - name: Package verified release assets
+        run: |
+          python3 et/ci/release.py package \
+            --build et/build/release-build --out et/build/release-assets \
+            --tag "$RELEASE_TAG"
+
+      - name: Transfer verified assets to the publishing job
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: maxion-release-assets
+          path: et/build/release-assets/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Retain diagnostic logs, including failed builds
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: maxion-build-diagnostics
+          path: |
+            et/build/input-verification.log
+            et/build/unit-tests.log
+            et/build/release-build/build.log
+            et/build/release-build/build-receipt.json
+            et/build/release-build/fw_jump.readelf.txt
+          if-no-files-found: ignore
+          retention-days: 14
+
+  publish:
+    needs: build
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the exact tag event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Download assets from this workflow run
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: maxion-release-assets
+          path: et/build/release-assets
+          digest-mismatch: error
+
+      - name: Reverify, upload to a draft, then publish the tagged release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: bash et/ci/publish-release.sh "$RELEASE_TAG" et/build/release-assets
