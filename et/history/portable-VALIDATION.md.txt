@@ -1,0 +1,65 @@
+# Packaging validation — October 21, 2026 (UTC)
+
+**Software-only cross-builds; no hardware was opened, booted, reset or flashed.**
+
+## Build result
+
+The default build completed successfully with these preinstalled tools:
+
+| Tool | Observed version |
+|---|---|
+| Host | Linux x86-64 |
+| GNU Make | 4.3 |
+| Python | 3.10.12 |
+| RISC-V GCC | Ubuntu `11.4.0-1ubuntu1~22.04`, GCC 11.4.0 |
+| RISC-V binutils | Ubuntu 2.38 |
+
+The resulting raw `fw_jump.bin` is **279,048 bytes**, SHA-256:
+
+```text
+97252e0c8dbd66b38950d14a89f3bfdedd994727ee22dc1f2652144cde23ba18
+```
+
+`cmp` confirmed byte-for-byte equality with the separately preserved
+`et/artifacts/maxion/fw_jump.bin`. ELF inspection reported RISC-V ELF64,
+little-endian, soft-float ABI, entry `0x8004200000`. The ELF was 2,577,536 bytes.
+This is a packaging-time observation with this toolchain, **not a promise that
+another toolchain produces identical bytes**.
+
+Compiler/tool binary SHA-256 values (for identification, not a bundled toolchain):
+
+```text
+0c54895c55568be5b5fee49e2426abcc8fb05ca2c121ca5685dea2cbc24a1c13  riscv64-linux-gnu-gcc
+59db886faf252e5e2fb2e5341fd57c24ddbd216197f69296321fef913e5b64ba  riscv64-linux-gnu-ld
+7985a5f5a10d03843aa7b296e1652bf5bd9fd5180839c7df9b49ef56738fcc74  riscv64-linux-gnu-ar
+48c1d507b5c7b89da9c81349738ee413a522c364a17d416bcfb91e2c8e785006  riscv64-linux-gnu-objcopy
+```
+
+## Additional checks
+
+- `bash -n build-opensbi.sh`, JSON parsing, manifest verification, archive
+  commit-metadata/path validation: PASS.
+- Both unchanged ET patches applied to the pristine archive with `--fuzz=0`:
+  PASS. No optional progress-marker patch was applied.
+- A complete copy of the portable inputs was rebuilt at a different path with
+  intentionally poisoned `FW_TEXT_START`, `FW_FDT_PATH`, `CFLAGS` and `MAKEFLAGS`
+  in its ambient environment: PASS; `.bin` still matched canonical bytes.
+  The ELF hashes differed, as expected for different debug source paths.
+- A third fresh build traced with `strace -f -e trace=network,execve` also
+  produced the canonical bytes. No IP sockets or dtc executions were recorded.
+  The trace did include failed local NSS-cache AF_UNIX connections. This is
+  evidence of no network retrieval during the build, **not** network-namespace
+  isolation or a sandbox/security certification.
+- Existing output destination: rejected (exit 1).
+- `JOBS=0`: rejected (exit 2).
+- Nonexistent compiler prefix: rejected before extraction (exit 1).
+- Corrupted source archive, even after regenerating the manifest: rejected by
+  the independent fixed SHA pin (exit 1).
+- Corrupted PLIC patch, even after regenerating the manifest: rejected by
+  the independent fixed SHA pin (exit 1).
+
+Full local build logs, receipts, objects, relocated copy and negative-test logs
+remain under ignored `build/`. They are validation scratch, not required source
+inputs and not intended for distribution. Each invocation writes its own receipt
+and log for future rebuilds. No prerequisites were missing on the packaging host;
+another offline server must preinstall the host tools/compiler listed in README.

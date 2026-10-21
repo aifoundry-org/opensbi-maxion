@@ -1,0 +1,293 @@
+{
+  "archive_sha256": "66b99d2af7298891bcb96d9471c92adff2fb272ef504d048f72813b65d9612c8",
+  "command": [
+    "/usr/bin/make",
+    "-C",
+    "/var/lib/shelley/work/opensbi-maxion/et/build/reproduce-1/source",
+    "O=/var/lib/shelley/work/opensbi-maxion/et/build/reproduce-1/objects",
+    "PLATFORM=generic",
+    "CROSS_COMPILE=/usr/bin/riscv64-linux-gnu-",
+    "PLATFORM_RISCV_XLEN=64",
+    "PLATFORM_RISCV_ISA=rv64imac_zicsr_zifencei",
+    "PLATFORM_RISCV_ABI=lp64",
+    "FW_TEXT_START=0x8004200000",
+    "FW_DYNAMIC=n",
+    "FW_JUMP=y",
+    "FW_PAYLOAD=n",
+    "FW_JUMP_ADDR=0x8600200000",
+    "FW_JUMP_FDT_OFFSET=0x2200000",
+    "BUILD_INFO=n",
+    "OPENSBI_VERSION_GIT=",
+    "-j2"
+  ],
+  "command_shell_display": "/usr/bin/make -C /var/lib/shelley/work/opensbi-maxion/et/build/reproduce-1/source O=/var/lib/shelley/work/opensbi-maxion/et/build/reproduce-1/objects PLATFORM=generic CROSS_COMPILE=/usr/bin/riscv64-linux-gnu- PLATFORM_RISCV_XLEN=64 PLATFORM_RISCV_ISA=rv64imac_zicsr_zifencei PLATFORM_RISCV_ABI=lp64 FW_TEXT_START=0x8004200000 FW_DYNAMIC=n FW_JUMP=y FW_PAYLOAD=n FW_JUMP_ADDR=0x8600200000 FW_JUMP_FDT_OFFSET=0x2200000 BUILD_INFO=n OPENSBI_VERSION_GIT= -j2",
+  "comparison": {
+    "byte_comparison": "identical",
+    "sha256": "97252e0c8dbd66b38950d14a89f3bfdedd994727ee22dc1f2652144cde23ba18",
+    "size": 279048
+  },
+  "configuration_files": {
+    "objects/platform/generic/firmware/fw_jump.elf.ld": "3053ae1734415bd1400b4d2dabfd15555d614748884caa96edfa6fb26101dfeb",
+    "objects/platform/generic/kconfig/.config": "7a2a453037a6c5eb03b8e03c33483cdd3a508d083fb765a05fa2fc0c5c32c05a",
+    "objects/platform/generic/kconfig/auto.conf": "8c8b377d2be7cd62924cfa838fee916023b662f51fa6b685b7a4f708fc3ed99d",
+    "objects/platform/generic/kconfig/autoconf.h": "3eeeec5b939f0e494944b1796547684137a1dd6c9352b7efb1e6e9c35cbd8ec1"
+  },
+  "environment": {
+    "HOME": "/var/lib/shelley/work/opensbi-maxion/et/build/reproduce-1/home",
+    "LC_ALL": "C",
+    "PATH": "/usr/bin:/bin",
+    "PYTHONNOUSERSITE": "1",
+    "SOURCE_DATE_EPOCH": "1790598985",
+    "TMPDIR": "/var/lib/shelley/work/opensbi-maxion/et/build/reproduce-1/tmp",
+    "TZ": "UTC"
+  },
+  "inputs": {
+    "reference": {
+      "sha256": "97252e0c8dbd66b38950d14a89f3bfdedd994727ee22dc1f2652144cde23ba18",
+      "size": 279048
+    },
+    "source": {
+      "commit": "ba6cec973383b66427d605692cb9843b0349eab9",
+      "full_tree": "f048c30f926905c34497da4665a14c2d2d5e564b",
+      "source_tree_excluding_et": "f048c30f926905c34497da4665a14c2d2d5e564b",
+      "support_status": "?? et/.gitignore\n?? et/PROVENANCE.json\n?? et/README.md\n?? et/build-tooling.md\n?? et/build.py\n?? et/diagnostics/README.md\n?? et/diagnostics/etsoc1-maxion.dts\n?? et/diagnostics/etsoc1-maxion.dtsi\n?? et/diagnostics/opensbi-etsoc1-progress-markers.patch\n?? et/diagnostics/payload_hello.S\n?? et/docs/PROVENANCE.md\n?? et/docs/RUNTIME.md\n?? et/history/README.md\n?? et/history/build-opensbi.sh.txt\n?? et/history/original-README.md.txt\n?? et/history/portable-VALIDATION.md.txt\n?? et/history/portable-build-opensbi.sh.txt\n?? et/licenses/et-platform-LICENSE\n?? et/licenses/et-platform-NOTICE\n?? et/patches/opensbi-etsoc1-mtval-sign-extension.patch\n?? et/patches/opensbi-etsoc1-plic-keep-priorities.patch\n?? et/reference/SHA256SUMS\n?? et/reference/fw_jump.bin\n?? et/tests/test_build.py\n?? et/toolchain.json\n",
+      "upstream_commit": "6ad246a1494807ee91e36ffcf60e4c30bb309d45"
+    },
+    "support_sha256": {
+      "build.py": "9b53d01991d014ac1fe2a2a48b57960240d702eeea5739c1abaf028c691e898b",
+      "toolchain.json": "4dcfbca144568a040c0a9c848e28dc99833a2152ab5ceaef8612b693a3f3eb55"
+    },
+    "toolchain": {
+      "cross_tools": {
+        "ar": {
+          "path": "/usr/bin/riscv64-linux-gnu-ar",
+          "resolved_path": "/usr/bin/riscv64-linux-gnu-ar",
+          "sha256": "7985a5f5a10d03843aa7b296e1652bf5bd9fd5180839c7df9b49ef56738fcc74",
+          "version": "GNU ar (GNU Binutils for Ubuntu) 2.38\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n"
+        },
+        "as": {
+          "path": "/usr/bin/riscv64-linux-gnu-as",
+          "resolved_path": "/usr/bin/riscv64-linux-gnu-as",
+          "sha256": "30ab46dce94fa2120f9465dd2965784af831363f75fac42ea9999819f6d15953",
+          "version": "GNU assembler (GNU Binutils for Ubuntu) 2.38\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or later.\nThis program has absolutely no warranty.\nThis assembler was configured for a target of `riscv64-linux-gnu'.\n"
+        },
+        "gcc": {
+          "path": "/usr/bin/riscv64-linux-gnu-gcc",
+          "resolved_path": "/usr/bin/riscv64-linux-gnu-gcc-11",
+          "sha256": "0c54895c55568be5b5fee49e2426abcc8fb05ca2c121ca5685dea2cbc24a1c13",
+          "version": "riscv64-linux-gnu-gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
+        },
+        "gcc_selected_as": {
+          "path": "/usr/lib/gcc-cross/riscv64-linux-gnu/11/../../../../riscv64-linux-gnu/bin/as",
+          "resolved_path": "/usr/bin/riscv64-linux-gnu-as",
+          "sha256": "30ab46dce94fa2120f9465dd2965784af831363f75fac42ea9999819f6d15953",
+          "version": "GNU assembler (GNU Binutils for Ubuntu) 2.38\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or later.\nThis program has absolutely no warranty.\nThis assembler was configured for a target of `riscv64-linux-gnu'.\n"
+        },
+        "gcc_selected_cc1": {
+          "path": "/usr/lib/gcc-cross/riscv64-linux-gnu/11/cc1",
+          "resolved_path": "/usr/lib/gcc-cross/riscv64-linux-gnu/11/cc1",
+          "sha256": "1a9e1e98ccec360a8bd5dccd4a5e00a7bfaaab07c16a1c6043750ca5b40bbe8b",
+          "version": ""
+        },
+        "gcc_selected_collect2": {
+          "path": "/usr/lib/gcc-cross/riscv64-linux-gnu/11/collect2",
+          "resolved_path": "/usr/lib/gcc-cross/riscv64-linux-gnu/11/collect2",
+          "sha256": "2a5eee8f85526afc8c8a1b8d7d51f1a8b9fd8b35041acf8e021c3e2b43caa3da",
+          "version": "GNU ld (GNU Binutils for Ubuntu) 2.38\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n"
+        },
+        "gcc_selected_ld": {
+          "path": "/usr/lib/gcc-cross/riscv64-linux-gnu/11/../../../../riscv64-linux-gnu/bin/ld",
+          "resolved_path": "/usr/bin/riscv64-linux-gnu-ld.bfd",
+          "sha256": "59db886faf252e5e2fb2e5341fd57c24ddbd216197f69296321fef913e5b64ba",
+          "version": "GNU ld (GNU Binutils for Ubuntu) 2.38\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n"
+        },
+        "ld": {
+          "path": "/usr/bin/riscv64-linux-gnu-ld",
+          "resolved_path": "/usr/bin/riscv64-linux-gnu-ld.bfd",
+          "sha256": "59db886faf252e5e2fb2e5341fd57c24ddbd216197f69296321fef913e5b64ba",
+          "version": "GNU ld (GNU Binutils for Ubuntu) 2.38\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n"
+        },
+        "objcopy": {
+          "path": "/usr/bin/riscv64-linux-gnu-objcopy",
+          "resolved_path": "/usr/bin/riscv64-linux-gnu-objcopy",
+          "sha256": "48c1d507b5c7b89da9c81349738ee413a522c364a17d416bcfb91e2c8e785006",
+          "version": "GNU objcopy (GNU Binutils for Ubuntu) 2.38\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n"
+        },
+        "readelf": {
+          "path": "/usr/bin/riscv64-linux-gnu-readelf",
+          "resolved_path": "/usr/bin/riscv64-linux-gnu-readelf",
+          "sha256": "2ee6c57f1efa53bda4a784afb82340b2d925383a8892c36df448028645af2d3f",
+          "version": "GNU readelf (GNU Binutils for Ubuntu) 2.38\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) any later version.\nThis program has absolutely no warranty.\n"
+        }
+      },
+      "host_tools": {
+        "awk": {
+          "path": "/usr/bin/awk",
+          "resolved_path": "/usr/bin/mawk",
+          "sha256": "dc157030a32367742480403025a6f731275b07d039238d167ade535e6f3eb98e"
+        },
+        "basename": {
+          "path": "/usr/bin/basename",
+          "resolved_path": "/usr/bin/basename",
+          "sha256": "a423d13293294e6bd0399b435a4bd88b02525494723519d4a4f82a8cd1dbf1ff"
+        },
+        "bash": {
+          "path": "/usr/bin/bash",
+          "resolved_path": "/usr/bin/bash",
+          "sha256": "59474588a312b6b6e73e5a42a59bf71e62b55416b6c9d5e4a6e1c630c2a9ecd4",
+          "version": "GNU bash, version 5.1.16(1)-release (x86_64-pc-linux-gnu)\nCopyright (C) 2020 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\nThis is free software; you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n"
+        },
+        "cat": {
+          "path": "/usr/bin/cat",
+          "resolved_path": "/usr/bin/cat",
+          "sha256": "407a78e2ebac6ca926e8f567c44dcc4e39d964836b863e0172b71967060bace3"
+        },
+        "cp": {
+          "path": "/usr/bin/cp",
+          "resolved_path": "/usr/bin/cp",
+          "sha256": "ff67abc6eb03d81e080343971605e185e64da71d9804dd5a556f9001a10f0586"
+        },
+        "dirname": {
+          "path": "/usr/bin/dirname",
+          "resolved_path": "/usr/bin/dirname",
+          "sha256": "34ccc3f134486d06dd132ba8da19e6a540b422f082c5fa775572242fdba9ff89"
+        },
+        "git": {
+          "path": "/usr/bin/git",
+          "resolved_path": "/usr/bin/git",
+          "sha256": "07997209f4513fdee3e1eb151b1c37d56cfe37f9915d331ec37d688c6b9d3ce9",
+          "version": "git version 2.34.1\n"
+        },
+        "grep": {
+          "path": "/usr/bin/grep",
+          "resolved_path": "/usr/bin/grep",
+          "sha256": "73abb4280520053564fd4917286909ba3b054598b32c9cdfaf1d733e0202cc96"
+        },
+        "head": {
+          "path": "/usr/bin/head",
+          "resolved_path": "/usr/bin/head",
+          "sha256": "0716a7c7e941f69b3bfeadfc675bc763398f4235603ed6b55dc0b5bc9de4cc1f"
+        },
+        "ln": {
+          "path": "/usr/bin/ln",
+          "resolved_path": "/usr/bin/ln",
+          "sha256": "3f990b42d8c1d5a7bddd6e74644313a7d42271ab8289010f2073b3542c433bdf"
+        },
+        "make": {
+          "path": "/usr/bin/make",
+          "resolved_path": "/usr/bin/make",
+          "sha256": "92f646030615cd98490a68a94c0aefd87b552be3158b941c02e43b0bfdb576db",
+          "version": "GNU Make 4.3\nBuilt for x86_64-pc-linux-gnu\nCopyright (C) 1988-2020 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n"
+        },
+        "mkdir": {
+          "path": "/usr/bin/mkdir",
+          "resolved_path": "/usr/bin/mkdir",
+          "sha256": "8e8ca3d351353ac914fa8997b47cd66653241f3e25785faf2df0158c8baded9b"
+        },
+        "od": {
+          "path": "/usr/bin/od",
+          "resolved_path": "/usr/bin/od",
+          "sha256": "4eaad5cd4df333b650be223e136cc117eeab56d747ea5107b93560f6da91d151"
+        },
+        "python3": {
+          "path": "/usr/bin/python3",
+          "resolved_path": "/usr/bin/python3.10",
+          "sha256": "a2f33a6e006989270f4340528eb61f8f97366e00a5d1b602ac8672ea44fc56ae",
+          "version": "Python 3.10.12\n"
+        },
+        "readlink": {
+          "path": "/usr/bin/readlink",
+          "resolved_path": "/usr/bin/readlink",
+          "sha256": "8c16df3f66c6030621dd8198f1a905377a86de68aa44fcb1528c4b1172cbc901"
+        },
+        "rm": {
+          "path": "/usr/bin/rm",
+          "resolved_path": "/usr/bin/rm",
+          "sha256": "ddd55eaa919b729b08d9a07fd2892985ed1d1291320b8dd113bd81cb389e10a9"
+        },
+        "sed": {
+          "path": "/usr/bin/sed",
+          "resolved_path": "/usr/bin/sed",
+          "sha256": "42e2ce00721556ff9d371778fc36adcbb7c1697f65c3f996c6c9b28206dba565"
+        },
+        "sh": {
+          "path": "/usr/bin/sh",
+          "resolved_path": "/usr/bin/dash",
+          "sha256": "4f291296e89b784cd35479fca606f228126e3641f5bcaee68dee36583d7c9483"
+        },
+        "tr": {
+          "path": "/usr/bin/tr",
+          "resolved_path": "/usr/bin/tr",
+          "sha256": "5f57710f6329d64250bd3caffa68fa4266516dfc863f8ccf81bd8e147ad48bd9"
+        },
+        "uname": {
+          "path": "/usr/bin/uname",
+          "resolved_path": "/usr/bin/uname",
+          "sha256": "89e9eef988b5ce6c35715a5e1bd2fa562413186acd4479bf52910f479513eb4f"
+        }
+      },
+      "packages": {
+        "command": [
+          "/usr/bin/dpkg-query",
+          "-W",
+          "-f=${binary:Package}\\t${Version}\\n",
+          "bash",
+          "binutils-riscv64-linux-gnu",
+          "coreutils",
+          "cpp-11-riscv64-linux-gnu",
+          "cpp-riscv64-linux-gnu",
+          "dash",
+          "gcc-11-riscv64-linux-gnu",
+          "gcc-11-riscv64-linux-gnu-base:amd64",
+          "gcc-riscv64-linux-gnu",
+          "git",
+          "grep",
+          "libc6-dev-riscv64-cross",
+          "libc6-riscv64-cross",
+          "libc6:amd64",
+          "libgcc-11-dev-riscv64-cross",
+          "libgcc-s1-riscv64-cross",
+          "libgmp10:amd64",
+          "libisl23:amd64",
+          "libmpc3:amd64",
+          "libmpfr6:amd64",
+          "libzstd1:amd64",
+          "linux-libc-dev-riscv64-cross",
+          "make",
+          "mawk",
+          "python3",
+          "python3.10",
+          "sed",
+          "zlib1g:amd64"
+        ],
+        "exit_status": 0,
+        "stderr": "",
+        "stdout": "bash\t5.1-6ubuntu1.1\nbinutils-riscv64-linux-gnu\t2.38-4ubuntu2.12\ncoreutils\t8.32-4.1ubuntu1.4\ncpp-11-riscv64-linux-gnu\t11.4.0-1ubuntu1~22.04cross1\ncpp-riscv64-linux-gnu\t4:11.2.0--1ubuntu1\ndash\t0.5.11+git20210903+057cd650a4ed-3build1\ngcc-11-riscv64-linux-gnu\t11.4.0-1ubuntu1~22.04cross1\ngcc-11-riscv64-linux-gnu-base:amd64\t11.4.0-1ubuntu1~22.04cross1\ngcc-riscv64-linux-gnu\t4:11.2.0--1ubuntu1\ngit\t1:2.34.1-1ubuntu1.18\ngrep\t3.7-1build1\nlibc6:amd64\t2.35-0ubuntu3.15\nlibc6-dev-riscv64-cross\t2.35-0ubuntu3cross4\nlibc6-riscv64-cross\t2.35-0ubuntu3cross4\nlibgcc-11-dev-riscv64-cross\t11.4.0-1ubuntu1~22.04cross1\nlibgcc-s1-riscv64-cross\t12.3.0-1ubuntu1~22.04cross1\nlibgmp10:amd64\t2:6.2.1+dfsg-3ubuntu1\nlibisl23:amd64\t0.24-2build1\nlibmpc3:amd64\t1.2.1-2build1\nlibmpfr6:amd64\t4.1.0-3build3\nlibzstd1:amd64\t1.4.8+dfsg-3build1\nlinux-libc-dev-riscv64-cross\t5.15.0-22.22cross4\nmake\t4.3-4.1build1\nmawk\t1.3.4.20200120-3\npython3\t3.10.6-1~22.04.1\npython3.10\t3.10.12-1~22.04.18\nsed\t4.8-1ubuntu2.1\nzlib1g:amd64\t1:1.2.11.dfsg-2ubuntu9.2\n"
+      }
+    }
+  },
+  "make_exit_status": 0,
+  "output_directory": "/var/lib/shelley/work/opensbi-maxion/et/build/reproduce-1",
+  "output_sha256": {
+    "build.log": "9bfd7f2dfdf520319182565e39e59aeac898709e3be8ecc34a602fa4df49457f",
+    "fw_jump.bin": "97252e0c8dbd66b38950d14a89f3bfdedd994727ee22dc1f2652144cde23ba18",
+    "fw_jump.elf": "fa4b4ad1a03df55e6a037888ab0da8d23bc5772fb3d7b270efe996a6243a2ba0",
+    "fw_jump.readelf.txt": "21f78b78fb2153cb8fdbbdbd55cf904ef5d1ec518006a06c0aea3a958ee9047a"
+  },
+  "settings": [
+    "PLATFORM=generic",
+    "CROSS_COMPILE=/usr/bin/riscv64-linux-gnu-",
+    "PLATFORM_RISCV_XLEN=64",
+    "PLATFORM_RISCV_ISA=rv64imac_zicsr_zifencei",
+    "PLATFORM_RISCV_ABI=lp64",
+    "FW_TEXT_START=0x8004200000",
+    "FW_DYNAMIC=n",
+    "FW_JUMP=y",
+    "FW_PAYLOAD=n",
+    "FW_JUMP_ADDR=0x8600200000",
+    "FW_JUMP_FDT_OFFSET=0x2200000",
+    "BUILD_INFO=n",
+    "OPENSBI_VERSION_GIT="
+  ],
+  "status": "BIT-IDENTICAL-PASS"
+}

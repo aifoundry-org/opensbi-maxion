@@ -1,0 +1,47 @@
+# OpenSBI for the ET-SoC-1 Maxion: the PU PLIC is shared with the Service Processor and the Master Minion.
+# plic_cold_irqchip_init() zeroes the priority of every source; with the DT property esperanto,keep-priorities
+# on the PLIC node this is skipped (PLIC_FLAG_KEEP_PRIORITY). Required, build-opensbi.sh applies it.
+# Against OpenSBI 6ad246a (v1.9+).
+diff --git a/include/sbi_utils/irqchip/plic.h b/include/sbi_utils/irqchip/plic.h
+index 0dbf4ed..6324e2d 100644
+--- a/include/sbi_utils/irqchip/plic.h
++++ b/include/sbi_utils/irqchip/plic.h
+@@ -32,6 +32,8 @@ struct plic_data {
+ #define PLIC_FLAG_THEAD_DELEGATION	BIT(1)
+ /** Allocate space for power management save/restore operations */
+ #define PLIC_FLAG_ENABLE_PM		BIT(2)
++/** PLIC shared with other agents: do not reset the source priorities at cold init */
++#define PLIC_FLAG_KEEP_PRIORITY		BIT(3)
+ 
+ #define PLIC_M_CONTEXT			0
+ #define PLIC_S_CONTEXT			1
+diff --git a/lib/utils/irqchip/fdt_irqchip_plic.c b/lib/utils/irqchip/fdt_irqchip_plic.c
+index 61c68ac..0f08b2e 100644
+--- a/lib/utils/irqchip/fdt_irqchip_plic.c
++++ b/lib/utils/irqchip/fdt_irqchip_plic.c
+@@ -82,6 +82,9 @@ static int irqchip_plic_cold_init(const void *fdt, int nodeoff,
+ 		goto fail_free_data;
+ 
+ 	pd->flags = (unsigned long)match->data;
++	/* ET-SoC-1: the PU PLIC is shared with the Service Processor and the Master Minion */
++	if (fdt_getprop(fdt, nodeoff, "esperanto,keep-priorities", NULL))
++		pd->flags |= PLIC_FLAG_KEEP_PRIORITY;
+ 
+ 	rc = irqchip_plic_update_context_map(fdt, nodeoff, pd);
+ 	if (rc)
+diff --git a/lib/utils/irqchip/plic.c b/lib/utils/irqchip/plic.c
+index 2d72172..2ff96b6 100644
+--- a/lib/utils/irqchip/plic.c
++++ b/lib/utils/irqchip/plic.c
+@@ -259,8 +259,9 @@ int plic_cold_irqchip_init(struct plic_data *plic)
+ 	}
+ 
+ 	/* Configure default priorities of all IRQs */
+-	for (i = 1; i <= plic->num_src; i++)
+-		plic_set_priority(plic, i, 0);
++	if (!(plic->flags & PLIC_FLAG_KEEP_PRIORITY))
++		for (i = 1; i <= plic->num_src; i++)
++			plic_set_priority(plic, i, 0);
+ 
+ 	plic_delegate(plic);
+ 
