@@ -82,6 +82,9 @@ static int irqchip_plic_cold_init(const void *fdt, int nodeoff,
 		goto fail_free_data;
 
 	pd->flags = (unsigned long)match->data;
+	/* ET-SoC-1: the PU PLIC is shared with the Service Processor and the Master Minion */
+	if (fdt_getprop(fdt, nodeoff, "esperanto,keep-priorities", NULL))
+		pd->flags |= PLIC_FLAG_KEEP_PRIORITY;
 
 	rc = irqchip_plic_update_context_map(fdt, nodeoff, pd);
 	if (rc)
