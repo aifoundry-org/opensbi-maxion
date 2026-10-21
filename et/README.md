@@ -1,5 +1,10 @@
 # ET-SOC1 Maxion OpenSBI — exact reference rebuild
 
+This repository also supplies **pre-kernel Maxion boot assets**: shared hardware
+device-tree sources and separate Linux/9front DTBs under [`et/dts/`](dts/README.md).
+These are supplementary ET assets, not changes to upstream OpenSBI and not
+embedded in its firmware binary.
+
 This branch carries the Maxion changes on top of upstream OpenSBI
 **`6ad246a1494807ee91e36ffcf60e4c30bb309d45`**, retaining upstream history.
 It builds the **same raw `fw_jump.bin` used for the successful Maxion Linux/
@@ -45,6 +50,7 @@ The validated native environment is **Ubuntu 22.04, x86-64 Linux**, using:
 | `binutils-riscv64-linux-gnu` | `2.38-4ubuntu2.12` |
 | GNU Make | 4.3 |
 | Code-generation awk | `mawk` package `1.3.4.20200120-3`, executable hash pinned |
+| Device-tree compiler (DT assets and complete test suite) | `device-tree-compiler=1.6.1-1`, executable hash pinned |
 | Python | 3.10 or newer; validation used 3.10.12 |
 | Other host tools | Git and standard Linux utilities |
 
@@ -56,7 +62,8 @@ sudo apt-get install git make python3 \
   gcc-riscv64-linux-gnu=4:11.2.0--1ubuntu1 \
   gcc-11-riscv64-linux-gnu=11.4.0-1ubuntu1~22.04cross1 \
   binutils-riscv64-linux-gnu=2.38-4ubuntu2.12 \
-  mawk=1.3.4.20200120-3
+  mawk=1.3.4.20200120-3 \
+  device-tree-compiler=1.6.1-1
 ```
 
 These commands install host packages only. The build itself needs no root
@@ -136,6 +143,23 @@ boot stub supplies the external DT in `a1`; OpenSBI relocates it to
 `0x8006400000` and hands off in S-mode. The firmware can serve Linux or 9front
 with their appropriate external kernels/DTs; those OS builds are not included
 here.
+
+## Build the external OS device trees
+
+The additional release assets use Ubuntu package
+`device-tree-compiler=1.6.1-1`. Its executable/version is pinned separately in
+`et/dts/toolchain.json`. No C preprocessor or firmware rebuild is needed:
+
+```sh
+python3 et/dts/build.py --verify-only
+python3 et/dts/build.py --out "$PWD/et/build/dts-reproduce-1"
+```
+
+Choose a new output directory. The Linux output is a **base profile**, not the
+final external-initramfs/session-specific launcher DTB. The 9front profile uses
+the kernel's embedded RAM-root. See [profile contracts and provenance](dts/README.md)
+before consuming either file. DTBs remain separately loaded runtime inputs:
+publishing them together does not embed them into `fw_jump.bin`.
 
 ## What was imported
 

@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "license": "Apache-2.0; original notices retained in reference sources and adapted profiles",
+  "inputs": [
+    {
+      "repository": "9front-et",
+      "observed_head": "18732d3350d8eb20c30b4b7f10235173715833d2",
+      "source_commit": "5ef533fc7fc7893df9f5b04ff676fa1c0ee51a7e",
+      "original_source": "et/platform/maxion/maxion.dts",
+      "reference_source": "reference/maxion-9front-original.dts",
+      "original_dtb": "et/artifacts/maxion/maxion.dtb",
+      "reference_dtb": "reference/maxion-9front-original.dtb",
+      "classification": "Independently preserved historical public 9front profile; clean input paths at observed HEAD."
+    },
+    {
+      "repository": "et-platform",
+      "observed_head": "cb3f00b751df0041f57dcaf926f06d9a723a577d",
+      "original_sources": [
+        "device-bootloaders/src/Maxion/linux/etsoc1-maxion-linux.dts",
+        "device-bootloaders/src/Maxion/opensbi/etsoc1-maxion.dtsi"
+      ],
+      "reference_sources": [
+        "reference/etsoc1-maxion-linux-original.dts",
+        "reference/etsoc1-maxion-original.dtsi"
+      ],
+      "reference_dtb": "reference/maxion-linux-public-base.dtb",
+      "classification": "Clean source paths at observed HEAD, corrected nominal 9330000-Hz timebase. Newly frozen PUBLIC DEFAULT base, not an actual historical private Linux launch DTB.",
+      "reference_derivation": "Original relative include layout reconstructed in a temporary directory; /usr/bin/cpp -nostdinc -undef -x assembler-with-cpp linux/etsoc1-maxion-linux.dts | pinned /usr/bin/dtc -I dts -O dtb. No macro overrides, INITRD_START or INITRD_END. CPP used only to establish this reference, never by build.py or publish verification."
+    }
+  ],
+  "reference_sha256": {
+    "reference/etsoc1-maxion-linux-original.dts": "93cda51d3dea3ff43268155271a9c39c97e31c22260e22c7fc2cebdc2b3e62a5",
+    "reference/etsoc1-maxion-original.dtsi": "8a06fb5d7626790974a809095c8504055d2ea9dee437e7310c077b03d44b43c8",
+    "reference/maxion-9front-original.dtb": "990cdb7f40c680534b3c57d70048fb8359a8dcf04a1ec02f4bc7f5d644d4183a",
+    "reference/maxion-9front-original.dts": "436f864fb16f0334423618da3732c84f751d415eea38a4f6de1c59bfef64f7a0",
+    "reference/maxion-linux-public-base.dtb": "95391dbcebbd8c10eb46e6e8f3a331c884be97458c67a77e5c844380920b66e5"
+  },
+  "adaptation": "maxion-common.dtsi adapts the original corrected common DTSI, with memory moved into the shared public tree. Native /include/ replaces CPP. Linux keeps the original default base. 9front overrides model/bootargs/Sv48 and retains CPU0-only detailed ISA properties, exactly matching its historical semantic profile.",
+  "qualification": "Offline static reproduction and semantic comparison only. No new hardware validation, initrd/session data, allocator reservation, firmware change, loader implementation or deployment permission."
+}

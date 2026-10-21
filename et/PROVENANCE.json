@@ -2,7 +2,7 @@
   "upstream_repository": "https://github.com/riscv-software-src/opensbi.git",
   "upstream_commit": "6ad246a1494807ee91e36ffcf60e4c30bb309d45",
   "upstream_tree": "55a808af978e000950dcb01e6cf0fc87b71a641f",
-  "production_source_tree_without_et": "765649af8f071b5981e3c186d35ab6da709af47a",
+  "production_source_tree_without_et": "e4cfebeae3381c05e8d77f558040eaaedd2aa24d",
   "required_patch_commits": [
     "8736d4f9d30e8fe94eec483635b34b3ab27b0afb",
     "b8681ccdd3e67e5f35360898f398dd2add67c82f"
@@ -77,5 +77,10 @@
     "c50ce7a2",
     "ba6cec97"
   ],
-  "attribution_rewrite": "et/docs/COMMIT-ATTRIBUTION.md"
+  "attribution_rewrite": "et/docs/COMMIT-ATTRIBUTION.md",
+  "supplementary_device_trees": {
+    "provenance": "et/dts/PROVENANCE.json",
+    "scope": "Public Linux base and 9front OS-specific external DT profiles; not embedded in firmware",
+    "qualification": "Static build and source comparison only; no new hardware qualification"
+  }
 }

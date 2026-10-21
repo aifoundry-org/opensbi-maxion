@@ -36,6 +36,8 @@ gh release create "$tag" --verify-tag --draft --title "$tag" \
     "$assets/ThirdPartyNotices.md" \
     "$assets/OPENSBI-BINARY-NOTICES.txt" \
     "$assets/et-platform-LICENSE" "$assets/et-platform-NOTICE" \
+    "$assets/maxion-linux.dtb" "$assets/maxion-9front.dtb" \
+    "$assets/dts-build-receipt.json" "$assets/dts-sources.tar.gz" \
     "$assets/release.json" "$assets/SHA256SUMS" "$assets/RELEASE-NOTES.md"
 check_remote_tag
 gh release edit "$tag" --draft=false

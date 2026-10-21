@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025 Ainekko, Co.
+// Public Linux base only: no initrd addresses or private runtime configuration.
+/dts-v1/;
+/include/ "maxion-common.dtsi"
+
+/ {
+	chosen {
+		/* Sv39 is the tested Linux path; never open ttyS0 and hvc0 together. */
+		bootargs = "earlycon=sbi console=ttyS0,115200n8 no4lvl";
+	};
+};

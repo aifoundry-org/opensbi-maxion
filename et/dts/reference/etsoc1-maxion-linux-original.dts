@@ -1,0 +1,58 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025 Ainekko, Co.
+//
+// Linux on the ET-SoC-1 Maxion cores.  Preprocessed with cpp so that the
+// loader can fill in what only it knows (see et-dev/bin/et-mxlinux):
+//
+//   -DBOOTARGS='"..."'                 kernel command line (default below)
+//   -DINITRD_START=0x8610000000 -DINITRD_END=0x86101a3c00
+//                                      initramfs (cpio) staged by the host
+//   -DMEM_BASE=0x8600000000 -DMEM_SIZE=0x40000000
+//                                      the memory Linux owns (default below)
+//
+// Memory: 1 GiB at 0x86_0000_0000, inside the host-managed DRAM allocator's
+// range, NOT reserved from it! The high address avoids small allocations
+// but gives no ownership guarantee. Use only with exclusive access: stop
+// SDK workloads/allocators and do not OTA while Linux is running. A permanent
+// coexistence setup needs an explicit host/MM memory carveout.
+// OpenSBI (fw_jump at 0x80_0420_0000) is outside this region, so
+// Linux never sees the PMP-protected firmware range; OpenSBI still adds a
+// reserved-memory node for it, which Linux ignores harmlessly.
+// Layout used by et-mxlinux inside the region:
+//   +0x00200000  Image (2 MiB aligned, = OpenSBI FW_JUMP_ADDR 0x86_0020_0000)
+//   +0x0f000000  source DTB (the pinned generic fw_jump copies it to
+//                FW_TEXT_START + 0x2200000 = 0x80_0640_0000 before Linux)
+//   +0x10000000  initramfs
+/dts-v1/;
+#include "../opensbi/etsoc1-maxion.dtsi"
+
+#ifndef MEM_BASE
+#define MEM_BASE 0x8600000000
+#endif
+#ifndef MEM_SIZE
+#define MEM_SIZE 0x40000000
+#endif
+#ifndef BOOTARGS
+/* earlycon=sbi: early printk through OpenSBI, handed over to ttyS0
+   (8250_dw, PLIC source 15). Alternative console=hvc0 is SBI-polled.
+   Never open both hvc0 and ttyS0: they share UART1 and steal RX data.
+   no4lvl: use the tested Sv39 path. */
+#define BOOTARGS "earlycon=sbi console=ttyS0,115200n8 no4lvl"
+#endif
+#define HI(x) ((x) >> 32)
+#define LO(x) ((x) & 0xffffffff)
+
+/ {
+	chosen {
+		bootargs = BOOTARGS;
+#ifdef INITRD_START
+		linux,initrd-start = <HI(INITRD_START) LO(INITRD_START)>;
+		linux,initrd-end = <HI(INITRD_END) LO(INITRD_END)>;
+#endif
+	};
+
+	memory@8600000000 {
+		device_type = "memory";
+		reg = <HI(MEM_BASE) LO(MEM_BASE) HI(MEM_SIZE) LO(MEM_SIZE)>;
+	};
+};

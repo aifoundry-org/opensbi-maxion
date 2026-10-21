@@ -1,0 +1,198 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025 Ainekko, Co.
+//
+// ET-SoC-1 Maxion neighbourhood as seen by firmware running on the Maxion
+// cores (OpenSBI generic platform / Linux): the common part, included by
+// etsoc1-maxion.dts (OpenSBI + hello payload, 2 MiB of memory) and
+// ../linux/etsoc1-maxion-linux.dts (memory node, initramfs, bootargs).
+// Preprocessed with cpp (#include), see build-opensbi.sh.  Addresses come from
+// etsoc-hal/include/hwinc/hal_device.h and the ET-SoC-1 Programmer's
+// Reference Manual, chapter 15 (I/O region layout):
+//
+//   R_MX_CLINT   0x0_0200_0000  msip @+0, mtimecmp @+0x4000, mtime @+0xBFF8
+//   R_PU_PLIC    0x0_1000_0000  sources 1..41; register contexts 2n/2n+1 =
+//                               Maxion n S-mode/M-mode (not logical target IDs!)
+//   R_PU_UART1   0x0_1200_7000  DW_apb_uart, 32-bit regs, "UART 3" on the
+//                               FT4232H of the PCIe dev card (ttyUSB3)
+//   DRAM         0x80_0000_0000 (through L3) / 0xC0_0000_0000 (L1/L2 only)
+//
+// Confirmed on silicon 2026-10-05 (boot stub + SP report, see doc/Maxion/MaxionBringup.md):
+//   * mhartid 0..3, misa = 0x800000000014112d (rv64imafdc + S + U),
+//     mvendorid 0x5e5, marchid 0x8000000000000002, mimpid 0x1
+//   * Historical report: ~3.7297e6 CLINT ticks per assumed RTOS second.
+//     CORRECTION: that scheduler interval is not a wall second. RTL divides
+//     uncore by 100 (~9.33 MHz at the 933 MHz target), not 250.
+//     Host-clock validation on 2026-10-10 supports the nominal 9,330,000 Hz
+//     timebase below; the old 3,733,333 made Linux time ~2.5x fast.
+//     This is not an exact all-chip rate or a measured CPU frequency. See
+//     doc/Maxion/ClockValidation.md. No PLL or SP RTOS change is involved.
+//   * OpenSBI v1.9 booted with this file (2026-10-06): priv spec 1.11, 8 PMP
+//     entries (4 B granularity, 38 address bits), 29 HPM counters, 1 debug
+//     trigger, extensions reported: zihpm, sdtrig, f, d.
+//   * the cores reset into debug mode; the boot stub dret's out of it.
+//   * all four harts run OpenSBI (2026-10-06): hart 0 cold-boots, the others
+//     come up through SBI HSM hart_start.
+// mmu-type: the Maxion implements 48-bit virtual / 40-bit physical addresses
+// (errata 3.24), Linux probes satp itself (Sv57 -> Sv48 -> Sv39), "no4lvl" on
+// the command line forces Sv39.
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	compatible = "esperanto,et-soc-1";
+	model = "Esperanto ET-SoC-1 (Maxion)";
+
+	chosen {
+		stdout-path = "serial0";
+		/* bootargs: see the .dts files */
+		/* Only hart 0 may be OpenSBI's cold-boot hart: the boot stub wakes
+		   the secondaries through CLINT msip while hart 0 is still printing
+		   its banner, and without this a secondary wins the relocation
+		   lottery and both write to UART1 at the same time. */
+		opensbi-config {
+			compatible = "opensbi,config";
+			cold-boot-harts = <&cpu0>;
+		};
+	};
+
+	aliases {
+		serial0 = &uart1;
+	};
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		/* Measured-consistent nominal rate; see ClockValidation.md. */
+		timebase-frequency = <9330000>;
+
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			reg = <0>;
+			status = "okay";
+			compatible = "riscv";
+			riscv,isa = "rv64imafdc";
+			riscv,isa-base = "rv64i";
+			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicsr", "zifencei";
+			mmu-type = "riscv,sv39";
+			cpu0_intc: interrupt-controller {
+				#address-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+		cpu1: cpu@1 {
+			device_type = "cpu";
+			reg = <1>;
+			status = "okay";
+			compatible = "riscv";
+			riscv,isa = "rv64imafdc";
+			riscv,isa-base = "rv64i";
+			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicsr", "zifencei";
+			mmu-type = "riscv,sv39";
+			cpu1_intc: interrupt-controller {
+				#address-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+		cpu2: cpu@2 {
+			device_type = "cpu";
+			reg = <2>;
+			status = "okay";
+			compatible = "riscv";
+			riscv,isa = "rv64imafdc";
+			riscv,isa-base = "rv64i";
+			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicsr", "zifencei";
+			mmu-type = "riscv,sv39";
+			cpu2_intc: interrupt-controller {
+				#address-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+		cpu3: cpu@3 {
+			device_type = "cpu";
+			reg = <3>;
+			status = "okay";
+			compatible = "riscv";
+			riscv,isa = "rv64imafdc";
+			riscv,isa-base = "rv64i";
+			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicsr", "zifencei";
+			mmu-type = "riscv,sv39";
+			cpu3_intc: interrupt-controller {
+				#address-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+	};
+
+	soc {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		compatible = "simple-bus";
+		ranges;
+
+		clint: clint@2000000 {
+			compatible = "sifive,clint0", "riscv,clint0";
+			reg = <0x0 0x02000000 0x0 0x10000>;
+			interrupts-extended = <&cpu0_intc 3>, <&cpu0_intc 7>,
+					      <&cpu1_intc 3>, <&cpu1_intc 7>,
+					      <&cpu2_intc 3>, <&cpu2_intc 7>,
+					      <&cpu3_intc 3>, <&cpu3_intc 7>;
+		};
+
+		plic: interrupt-controller@10000000 {
+			compatible = "sifive,plic-1.0.0", "riscv,plic0";
+			reg = <0x0 0x10000000 0x0 0x2000000>;
+			#address-cells = <0>;
+			#interrupt-cells = <1>;
+			interrupt-controller;
+			riscv,ndev = <41>;
+			/* The PU PLIC is shared with the Service Processor (contexts 64/65)
+			   and the Master Minion (32/33, PCIe message source 33, ...).
+			   OpenSBI (with the ET patch) must not zero all source priorities
+			   at cold init, or a Maxion reboot kills the Master Minion's
+			   interrupts. Linux needs the corresponding keep-priorities patch
+			   too: its probe otherwise rewrites every source's priority.
+			   Both then change only Maxion-owned sources (UART1 = 15). */
+			esperanto,keep-priorities;
+			/* Context numbering = register address order (threshold at
+			   0x200000 + ctx * 0x1000, enables at 0x2000 + ctx * 0x80), as
+			   every PLIC driver assumes.  hwinc/pu_plic.h names them by
+			   "target" T(2n+2) = Maxion n M-mode, T(2n+3) = Maxion n S-mode,
+			   and the S-mode target of each pair sits at the LOWER address:
+			   ctx 0/1 = T3/T2 (Maxion 0 S/M), 2/3 = T5/T4, 4/5 = T7/T6,
+			   6/7 = T9/T8, ctx 32/33 = T11/T10 (Minion), ctx 64/65 = T1/T0
+			   (Service Processor cascade). RTL ios_plic.v pu_target_idx
+			   confirms the remapping (RTLMIN-3266), maxshire_top.v routes
+			   logical targets to the cores. Verified 2026-10-06: UART1
+			   interrupt affinity works on each of Linux CPUs 0..3.
+			   Only the Maxion contexts are listed. */
+			interrupts-extended = <&cpu0_intc 9>, <&cpu0_intc 11>,
+					      <&cpu1_intc 9>, <&cpu1_intc 11>,
+					      <&cpu2_intc 9>, <&cpu2_intc 11>,
+					      <&cpu3_intc 9>, <&cpu3_intc 11>;
+		};
+
+		uart1: serial@12007000 {
+			compatible = "snps,dw-apb-uart", "ns16550a";
+			reg = <0x0 0x12007000 0x0 0x1000>;
+			reg-shift = <2>;
+			reg-io-width = <4>;
+			/* UART sclk per et-common-libs serial.c (set_baud_divisor 115200 @ 25 MHz,
+			   DLL/DLH = 13, DLF = 9/16).  25e6/16/115200 = 13.56 cannot be hit with the
+			   integer divisor OpenSBI's uart8250 driver programs (14 -> -3.1 %), so
+			   current-speed = 0 makes OpenSBI keep the SP's divisor.  Linux's 8250_dw
+			   driver uses DLF and gets it right from clock-frequency. */
+			clock-frequency = <25000000>;
+			current-speed = <0>;
+			interrupt-parent = <&plic>;
+			interrupts = <15>;
+			status = "okay";
+		};
+	};
+};

@@ -11,7 +11,8 @@ suffixes or prereleases). Ordinary branch pushes and upstream tags such as
 1. Check out the exact commit from the tag-push event, with complete history.
    The local tag must resolve to that commit. Verify `et/SHA256SUMS`.
 2. On the native `ubuntu-22.04` runner, explicitly install the recorded Ubuntu
-   GCC 11.4.0 cross-toolchain, binutils 2.38 and mawk packages. Executable hashes and
+   GCC 11.4.0 cross-toolchain, binutils 2.38, mawk and device-tree-compiler packages.
+   Executable hashes and
    complete version strings must pass the existing preflight. Package removal
    from the Ubuntu mirrors is a failure, not permission to substitute tools.
    The builder privately selects pinned mawk as `awk`, regardless of the
@@ -19,8 +20,10 @@ suffixes or prereleases). Ordinary branch pushes and upstream tags such as
 3. Run offline tests, compile in a fresh directory, and require the historical
    raw firmware size, SHA-256 and full byte comparison. The first release
    remains the same firmware used for Linux and 9front.
-4. Validate the build receipt against the clean tagged checkout, tools and
-   output files. Produce an explicit, checksummed release asset set.
+4. Build the public Linux-base and 9front device trees using pinned dtc.
+   Validate firmware and DT receipts against the clean tagged checkout, tools,
+   source archives and output files. Produce an explicit, checksummed release
+   asset set. DT verification in the publishing job needs no compiler.
 5. Transfer assets within the same workflow run to a separate publishing job.
    That job rechecks the package against its own checkout of the event commit
    and verifies the remote tag still resolves to the expected commit.
@@ -54,6 +57,10 @@ or a newly accepted reference.
 |---|---|
 | `fw_jump.bin` | Canonical raw firmware consumed by the OS boot package |
 | `fw_jump.elf` | Diagnostic symbols; not a bit-identical cross-path target |
+| `maxion-linux.dtb` | Linux base profile; external initrd/session configuration is runtime-only |
+| `maxion-9front.dtb` | 9front Sv48, single-hart, polling-console RAM-root profile |
+| `dts-build-receipt.json` | DT source/tool identities, output hashes and validation scope |
+| `dts-sources.tar.gz` | Deterministic source/recipe/provenance/license archive for both DTBs |
 | `build-receipt.json`, `build.log`, `fw_jump.readelf.txt` | Actual compilation evidence |
 | `toolchain.json`, `PROVENANCE.json` | Compiler pins and historical source provenance |
 | `release.json` | Tag, full source commit, firmware identity and asset hashes |
@@ -65,6 +72,11 @@ or a newly accepted reference.
 `SHA256SUMS` intentionally does not checksum itself. The release manifest and
 checksums are integrity records, not standalone signatures or GitHub build
 attestations.
+
+The expanded package uses release manifest **schema version 2** and contains
+19 assets. Its firmware `BIT-IDENTICAL-PASS` applies only to the historical
+`fw_jump.bin`; it does not claim historical DTB byte identity or new hardware
+qualification for either profile. Firmware-only v1.0.1 remains unchanged.
 
 ## Maintainer procedure
 
@@ -109,6 +121,17 @@ separately from the OS-specific assets:
 Neither OS links OpenSBI into its kernel. The separately loaded firmware runs
 first and hands off through the shared [runtime contract](RUNTIME.md), including
 the fixed next-stage entry address. Each OS supplies a compatible external DT.
+
+The extended release supplies those DT profiles together with the firmware.
+Consumers pin **each asset's** expected hash, not just the release tag.
+For Linux with an external initramfs, the launcher must verify the released
+base, add the actual `linux,initrd-start`/`linux,initrd-end` to a private copy,
+and record both base and final DTB hashes and the applied configuration.
+Any optional packet/bootstrap session data also stays private and runtime-only.
+Do not describe the derived DTB as byte-identical to the release asset.
+The released 9front profile needs no Linux initrd fixup.
+Generic QEMU `fw_dynamic` and its virtual hardware description remain separate;
+do not replace them with these hardware-addressed assets.
 
 Never select “latest,” accept a checksum solely because it arrived beside an
 untrusted binary, or fetch replacement firmware from the running guest kernel.

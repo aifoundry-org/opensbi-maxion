@@ -25,7 +25,7 @@ There is no tested container workflow and the builder never uses Docker.
 
 The script captures `HEAD` and its full tree, reconstructs the root Git tree hash
 with only `et/` removed, and demands
-`765649af8f071b5981e3c186d35ab6da709af47a` (including the release workflow; firmware sources unchanged). Dirty tracked files outside `et/`
+`e4cfebeae3381c05e8d77f558040eaaedd2aa24d` (including the release workflow; firmware sources unchanged). Dirty tracked files outside `et/`
 (staged or unstaged) fail. Untracked source-side files cannot enter the build:
 only a fresh `git archive` of the captured commit is extracted. No vendor tarball
 or patch reapplication is involved. The archive includes committed `et/` support

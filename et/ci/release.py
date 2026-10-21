@@ -14,6 +14,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location("maxion_release_builder", ROOT / "et/build.py")
 builder = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(builder)
+DTS_SPEC = importlib.util.spec_from_file_location("maxion_release_dts", ROOT / "et/dts/build.py")
+dts = importlib.util.module_from_spec(DTS_SPEC)
+DTS_SPEC.loader.exec_module(dts)
 
 TAG_PATTERN = r"maxion-v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
 OUTPUTS = ("fw_jump.bin", "fw_jump.elf", "build.log", "fw_jump.readelf.txt")
@@ -26,7 +29,7 @@ COPIES = {
     "et-platform-LICENSE": "et/licenses/et-platform-LICENSE",
     "et-platform-NOTICE": "et/licenses/et-platform-NOTICE",
 }
-PAYLOADS = (*OUTPUTS, "build-receipt.json", *COPIES, "RELEASE-NOTES.md")
+PAYLOADS = (*OUTPUTS, "build-receipt.json", *COPIES, *dts.ASSETS, "RELEASE-NOTES.md")
 ASSETS = (*PAYLOADS, "release.json", "SHA256SUMS")
 
 
@@ -77,6 +80,13 @@ ELF is diagnostic; debug paths can differ and ELF identity is not the acceptance
 target. See build-receipt.json, release.json, toolchain.json and PROVENANCE.json
 for source, recipe, pinned toolchain and historical provenance. SHA256SUMS covers
 every other release asset (not itself).
+
+The separate `maxion-linux.dtb` and `maxion-9front.dtb` device-tree profiles
+are built from the tagged `et/dts/` sources; their receipt and source archive
+are included. The Linux base profile needs runtime initrd start/end metadata
+when an initrd is used. Use the 9front OS profile for 9front, not the Linux
+profile. Firmware BIT-IDENTICAL-PASS applies only to `fw_jump.bin`: these DT
+artifacts are source-bound build evidence, not new DT hardware qualification.
 
 This is build-only evidence, not a new hardware boot or hardware qualification
 claim, security certification, deployment approval, or OTA/rollback guarantee.
@@ -134,23 +144,42 @@ def validated_build(root, build, tag):
     return source, support, files
 
 
-def package(root, build, out, tag):
+def validated_dts(directory, source_dir):
+    files = {name: read_regular(directory / name) for name in dts.ASSETS}
+    dts.verify_bundle(files, source_dir)
+    return files
+
+
+def dts_provenance(files):
+    return {
+        "receipt_sha256": sha(files["dts-build-receipt.json"]),
+        "profiles_sha256": {name: sha(files[name])
+                           for name in ("maxion-linux.dtb", "maxion-9front.dtb")},
+        "sources_archive_sha256": sha(files["dts-sources.tar.gz"]),
+        "qualification": "source-bound build evidence; no new DT hardware qualification",
+    }
+
+
+def package(root, build, out, tag, dts_build):
     check_tag(tag)
     # Do not follow a dangling output symlink or reuse any prior evidence.
     require(not out.exists() and not out.is_symlink(), "Output path already exists: " + str(out))
     source, support, files = validated_build(root, build, tag)
+    files.update(validated_dts(dts_build, root / "et/dts"))
     files["RELEASE-NOTES.md"] = notes(tag, source["commit"]).encode()
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "tag": tag,
         "commit": source["commit"],
         "tag_commit": source["commit"],
         "source": source,
         "status": "BIT-IDENTICAL-PASS",
+        "status_scope": "fw_jump.bin only; no new DT hardware qualification",
         "reference": reference_identity(),
         "support_sha256": support,
         "receipt_sha256": sha(files["build-receipt.json"]),
         "provenance_sha256": sha(files["PROVENANCE.json"]),
+        "dts": dts_provenance(files),
         "assets_sha256": {name: sha(data) for name, data in sorted(files.items())},
     }
     files["release.json"] = json_bytes(manifest)
@@ -174,11 +203,15 @@ def verify_package(assets, tag):
                        for name in sorted(set(ASSETS) - {"SHA256SUMS"})).encode()
     require(files["SHA256SUMS"] == expected, "Release SHA256SUMS mismatch")
     manifest = json.loads(files["release.json"])
+    require(manifest["schema_version"] == 2, "Release schema version mismatch")
     require(manifest["tag"] == tag, "Release tag mismatch")
     require(manifest["status"] == "BIT-IDENTICAL-PASS", "Release is not BIT-IDENTICAL-PASS")
     require(re.fullmatch(r"[0-9a-f]{40}", manifest["commit"]) is not None
             and manifest["tag_commit"] == manifest["commit"], "Release commit mismatch")
     require(manifest["reference"] == reference_identity(), "Release reference mismatch")
+    require(manifest["status_scope"] == "fw_jump.bin only; no new DT hardware qualification",
+            "Release qualification scope mismatch")
+    require(manifest["dts"] == dts_provenance(files), "Release DT provenance mismatch")
     require(manifest["assets_sha256"] == {name: sha(files[name]) for name in PAYLOADS},
             "Release manifest asset hashes mismatch")
     require(sha(files["fw_jump.bin"]) == builder.REFERENCE_SHA256
@@ -191,6 +224,7 @@ def verify_checkout(assets, tag, root):
     """Bind downloaded assets to this exact, clean tagged checkout."""
     manifest = verify_package(assets, tag)
     source, support, expected_files = validated_build(root, assets, tag)
+    validated_dts(assets, root / "et/dts")
     require(manifest["source"] == source and manifest["commit"] == source["commit"],
             "Release manifest source differs from current checkout")
     require(manifest["support_sha256"] == support, "Release manifest support hashes differ")
@@ -211,6 +245,7 @@ def main(argv=None):
     commands = parser.add_subparsers(dest="command", required=True)
     pack = commands.add_parser("package", help="validate a current tagged build and create NEWDIR")
     pack.add_argument("--build", type=Path, required=True)
+    pack.add_argument("--dts-build", type=Path, required=True)
     pack.add_argument("--out", type=Path, required=True)
     pack.add_argument("--tag", required=True)
     verify = commands.add_parser("verify", help="verify upload assets against this clean tagged checkout")
@@ -218,7 +253,7 @@ def main(argv=None):
     verify.add_argument("--tag", required=True)
     args = parser.parse_args(argv)
     if args.command == "package":
-        manifest = package(ROOT, args.build, args.out, args.tag)
+        manifest = package(ROOT, args.build, args.out, args.tag, args.dts_build)
         print(f"RELEASE-PACKAGE-PASS: {manifest['tag']} {manifest['commit']} -> {args.out}")
     else:
         verify_checkout(args.assets, args.tag, ROOT)

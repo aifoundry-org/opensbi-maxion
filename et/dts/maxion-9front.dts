@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: Apache-2.0
+// Hardware description adapted from Ainekko's ET-SoC-1 Maxion Linux/OpenSBI
+// work. Copyright (c) 2025 Ainekko, Co.
+// Preserve the historical 9front RAM-root, single-CPU, polling profile.
+/dts-v1/;
+/include/ "maxion-common.dtsi"
+
+/ {
+	model = "Esperanto ET-SoC-1 Maxion: 9front RAM-root bring-up";
+	chosen {
+		bootargs = "console=0 user=glenda *ncpu=1 *uartpoll=1";
+	};
+};
+
+&cpu0 {
+	mmu-type = "riscv,sv48";
+};
+
+/* Keep the original profile exactly, including CPU0-only ISA detail. */
+&cpu1 {
+	mmu-type = "riscv,sv48";
+	/delete-property/ riscv,isa-base;
+	/delete-property/ riscv,isa-extensions;
+};
+&cpu2 {
+	mmu-type = "riscv,sv48";
+	/delete-property/ riscv,isa-base;
+	/delete-property/ riscv,isa-extensions;
+};
+&cpu3 {
+	mmu-type = "riscv,sv48";
+	/delete-property/ riscv,isa-base;
+	/delete-property/ riscv,isa-extensions;
+};

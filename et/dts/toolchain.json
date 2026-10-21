@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "dtc": {
+    "path": "/usr/bin/dtc",
+    "version": "Version: DTC 1.6.1",
+    "sha256": "7dc0f6b40a991e029b54dea4f5cdae15adccfa246fc156eef96ec27b525f5ea2",
+    "package": "device-tree-compiler",
+    "package_version": "1.6.1-1",
+    "environment": "Ubuntu 22.04 x86-64 Linux"
+  },
+  "outputs": {
+    "maxion-linux.dtb": {
+      "sha256": "95391dbcebbd8c10eb46e6e8f3a331c884be97458c67a77e5c844380920b66e5",
+      "size": 2917
+    },
+    "maxion-9front.dtb": {
+      "sha256": "2af95f991d3b8731b3a2a48f98d0b1ef17b40d4df40c2341784c0aef8216bfb0",
+      "size": 2761
+    }
+  }
+}

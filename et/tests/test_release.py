@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Offline packaging/publishing controls; no compiler, network or hardware."""
+"""Offline packaging/publishing controls; pinned dtc only, no network or hardware."""
 
 import copy
 import importlib.util
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -19,6 +20,13 @@ SPEC.loader.exec_module(release)
 
 
 class ReleaseControls(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.dts_temp = tempfile.TemporaryDirectory(prefix="maxion-release-dts-")
+        cls.addClassCleanup(cls.dts_temp.cleanup)
+        cls.dts_bundle = Path(cls.dts_temp.name) / "bundle"
+        release.dts.build(cls.dts_bundle, release.ROOT / "et/dts")
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="maxion-release-")
         self.addCleanup(self.temp.cleanup)
@@ -26,13 +34,22 @@ class ReleaseControls(unittest.TestCase):
         self.root = self.base / "repo"
         self.build = self.base / "build"
         self.out = self.base / "assets"
+        self.dts_build = self.base / "dts-build"
         self.build.mkdir()
+        self.dts_build.mkdir()
         self.tag = "maxion-v1.0.0"
         for name in (*release.COPIES.values(), "et/build.py", "et/.gitignore", "et/reference/fw_jump.bin",
                      "et/ci/release.py", "et/ci/publish-release.sh"):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes((release.ROOT / name).read_bytes())
+        for path in (release.ROOT / "et/dts").rglob("*"):
+            if path.is_file() and "__pycache__" not in path.parts:
+                target = self.root / path.relative_to(release.ROOT)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(path.read_bytes())
+        for name in release.dts.ASSETS:
+            (self.dts_build / name).write_bytes((self.dts_bundle / name).read_bytes())
         # Git commits/tags exist only in this disposable fixture, never the
         # working repository. Pin its non-et tree without weakening real pins.
         self.git("init", "-q")
@@ -95,17 +112,22 @@ class ReleaseControls(unittest.TestCase):
         (self.build / "build-receipt.json").write_bytes(release.json_bytes(self.receipt))
 
     def package(self):
-        return release.package(self.root, self.build, self.out, self.tag)
+        return release.package(self.root, self.build, self.out, self.tag, self.dts_build)
 
     def rejected(self, message):
-        with self.assertRaisesRegex((release.ReleaseError, release.builder.BuildError), message):
+        with self.assertRaisesRegex((release.ReleaseError, release.builder.BuildError, ValueError), message):
             self.package()
         self.assertFalse(self.out.exists(), "Invalid input must not create a package")
 
     def test_positive_package_and_cli_verification(self):
         manifest = self.package()
         self.assertEqual(set(p.name for p in self.out.iterdir()), set(release.ASSETS))
-        self.assertEqual(len(release.ASSETS), 15)
+        self.assertEqual(len(release.ASSETS), 19)
+        self.assertEqual(manifest["schema_version"], 2)
+        for name in release.dts.ASSETS:
+            self.assertEqual((self.out / name).read_bytes(), (self.dts_build / name).read_bytes())
+        self.assertEqual(manifest["dts"], release.dts_provenance({
+            name: (self.out / name).read_bytes() for name in release.dts.ASSETS}))
         for name in ("COPYING.BSD", "ThirdPartyNotices.md"):
             self.assertEqual((self.out / name).read_bytes(), (self.root / name).read_bytes())
         self.assertEqual((self.out / "OPENSBI-BINARY-NOTICES.txt").read_bytes(),
@@ -124,6 +146,9 @@ class ReleaseControls(unittest.TestCase):
         notes = (self.out / "RELEASE-NOTES.md").read_text()
         self.assertIn("immutable pinned historical raw-byte baseline", notes)
         self.assertIn("not a new hardware boot", notes)
+        self.assertIn("runtime initrd start/end metadata", notes)
+        self.assertIn("9front OS profile", notes)
+        self.assertIn("not new DT hardware qualification", notes)
         result = subprocess.run([sys.executable, str(self.root / "et/ci/release.py"), "verify",
                                  "--assets", str(self.out), "--tag", self.tag],
                                 capture_output=True, text=True)
@@ -258,6 +283,41 @@ class ReleaseControls(unittest.TestCase):
         path.symlink_to(self.root / "et/reference/fw_jump.bin")
         self.rejected("Missing regular file")
 
+    def test_each_mandatory_dt_asset_missing_rejected(self):
+        for name in release.dts.ASSETS:
+            with self.subTest(name=name):
+                path = self.dts_build / name
+                original = path.read_bytes()
+                path.unlink()
+                self.rejected("Missing regular file")
+                path.write_bytes(original)
+
+    def test_corrupted_dt_blobs_receipt_and_archive_rejected(self):
+        for name in release.dts.ASSETS:
+            with self.subTest(name=name):
+                path = self.dts_build / name
+                original = path.read_bytes()
+                path.write_bytes(original + b"tamper")
+                self.rejected(".+")
+                path.write_bytes(original)
+
+    def test_cli_requires_dt_build_directory(self):
+        result = subprocess.run(
+            [sys.executable, str(self.root / "et/ci/release.py"), "package",
+             "--build", str(self.build), "--out", str(self.out), "--tag", self.tag],
+            capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("--dts-build", result.stderr)
+        self.assertFalse(self.out.exists())
+
+    def test_checkout_dt_verification_does_not_run_compiler_or_other_tools(self):
+        self.package()
+        # Git lookups are already mocked in-process; all DT bundle checks must
+        # operate on bytes and the trusted source tree, never local dtc.
+        with patch.object(release.dts.subprocess, "run",
+                          side_effect=AssertionError("DT verifier invoked a tool")):
+            release.verify_checkout(self.out, self.tag, self.root)
+
     def test_publish_verification_rejects_tag_tamper_extra_files_and_symlinks(self):
         self.package()
         with self.assertRaisesRegex(release.ReleaseError, "tag mismatch"):
@@ -284,6 +344,8 @@ class ReleaseControls(unittest.TestCase):
         }
         manifest["receipt_sha256"] = manifest["assets_sha256"]["build-receipt.json"]
         manifest["provenance_sha256"] = manifest["assets_sha256"]["PROVENANCE.json"]
+        manifest["dts"] = release.dts_provenance({
+            name: (self.out / name).read_bytes() for name in release.dts.ASSETS})
         (self.out / "release.json").write_bytes(release.json_bytes(manifest))
         (self.out / "SHA256SUMS").write_text("".join(
             f"{release.sha((self.out / name).read_bytes())}  {name}\n"
@@ -298,7 +360,8 @@ class ReleaseControls(unittest.TestCase):
     def test_cli_package_with_real_clean_annotated_tag_checkout(self):
         result = subprocess.run(
             [sys.executable, str(self.root / "et/ci/release.py"), "package",
-             "--build", str(self.build), "--out", str(self.out), "--tag", self.tag],
+             "--build", str(self.build), "--dts-build", str(self.dts_build),
+             "--out", str(self.out), "--tag", self.tag],
             capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.verify_cli().returncode, 0)
@@ -341,6 +404,23 @@ class ReleaseControls(unittest.TestCase):
                 self.assertIn("differs", result.stderr)
                 path.write_bytes(original)
                 self.reseal()
+
+    def test_checkout_verification_rejects_resealed_dt_bundle_from_other_sources(self):
+        self.package()
+        alternate_sources = self.base / "alternate-dts"
+        shutil.copytree(self.root / "et/dts", alternate_sources,
+                        ignore=shutil.ignore_patterns("__pycache__"))
+        source = alternate_sources / "maxion-linux.dts"
+        source.write_bytes(source.read_bytes() + b"\n/* Different, untagged source provenance. */\n")
+        alternate_bundle = self.base / "alternate-bundle"
+        release.dts.build(alternate_bundle, alternate_sources)
+        for name in release.dts.ASSETS:
+            (self.out / name).write_bytes((alternate_bundle / name).read_bytes())
+        self.reseal()
+        release.verify_package(self.out, self.tag)  # All uploaded hashes are consistent.
+        result = self.verify_cli()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("ERROR:", result.stderr)
 
     def test_checkout_verification_rejects_dirty_support_source_and_moved_local_tag(self):
         self.package()

@@ -1,0 +1,136 @@
+// SPDX-License-Identifier: Apache-2.0
+// Hardware description adapted from Ainekko's ET-SoC-1 Maxion Linux/OpenSBI
+// work in et-platform/device-bootloaders/src/Maxion/opensbi.
+// Public bring-up DT: no mailbox packet session, bootstrap seed or initrd.
+/dts-v1/;
+
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	compatible = "esperanto,et-soc-1";
+	model = "Esperanto ET-SoC-1 Maxion: 9front RAM-root bring-up";
+
+	chosen {
+		stdout-path = "serial0";
+		bootargs = "console=0 user=glenda *ncpu=1 *uartpoll=1";
+		opensbi-config {
+			compatible = "opensbi,config";
+			cold-boot-harts = <&cpu0>;
+		};
+	};
+
+	aliases {
+		serial0 = &uart1;
+	};
+
+	/* Exclusive ownership is external: this does not reserve host memory. */
+	memory@8600000000 {
+		device_type = "memory";
+		reg = <0x86 0 0 0x40000000>;
+	};
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		timebase-frequency = <9330000>;
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			reg = <0>;
+			status = "okay";
+			compatible = "riscv";
+			riscv,isa = "rv64imafdc";
+			riscv,isa-base = "rv64i";
+			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicsr", "zifencei";
+			mmu-type = "riscv,sv48";
+			cpu0_intc: interrupt-controller {
+				#address-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+		cpu1: cpu@1 {
+			device_type = "cpu";
+			reg = <1>;
+			status = "okay";
+			compatible = "riscv";
+			riscv,isa = "rv64imafdc";
+			mmu-type = "riscv,sv48";
+			cpu1_intc: interrupt-controller {
+				#address-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+		cpu2: cpu@2 {
+			device_type = "cpu";
+			reg = <2>;
+			status = "okay";
+			compatible = "riscv";
+			riscv,isa = "rv64imafdc";
+			mmu-type = "riscv,sv48";
+			cpu2_intc: interrupt-controller {
+				#address-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+		cpu3: cpu@3 {
+			device_type = "cpu";
+			reg = <3>;
+			status = "okay";
+			compatible = "riscv";
+			riscv,isa = "rv64imafdc";
+			mmu-type = "riscv,sv48";
+			cpu3_intc: interrupt-controller {
+				#address-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+	};
+
+	soc {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		compatible = "simple-bus";
+		ranges;
+		clint@2000000 {
+			compatible = "sifive,clint0", "riscv,clint0";
+			reg = <0 0x02000000 0 0x10000>;
+			interrupts-extended = <&cpu0_intc 3>, <&cpu0_intc 7>,
+				<&cpu1_intc 3>, <&cpu1_intc 7>,
+				<&cpu2_intc 3>, <&cpu2_intc 7>,
+				<&cpu3_intc 3>, <&cpu3_intc 7>;
+		};
+		plic: interrupt-controller@10000000 {
+			compatible = "sifive,plic-1.0.0", "riscv,plic0";
+			reg = <0 0x10000000 0 0x02000000>;
+			#address-cells = <0>;
+			#interrupt-cells = <1>;
+			interrupt-controller;
+			riscv,ndev = <41>;
+			esperanto,keep-priorities;
+			/* Register contexts are S0,M0,S1,M1,S2,M2,S3,M3. */
+			interrupts-extended = <&cpu0_intc 9>, <&cpu0_intc 11>,
+				<&cpu1_intc 9>, <&cpu1_intc 11>,
+				<&cpu2_intc 9>, <&cpu2_intc 11>,
+				<&cpu3_intc 9>, <&cpu3_intc 11>;
+		};
+		uart1: serial@12007000 {
+			compatible = "snps,dw-apb-uart", "ns16550a";
+			reg = <0 0x12007000 0 0x1000>;
+			reg-shift = <2>;
+			reg-io-width = <4>;
+			clock-frequency = <25000000>;
+			/* Keep the SP's fractional 115200-baud divisor. */
+			current-speed = <0>;
+			interrupt-parent = <&plic>;
+			interrupts = <15>;
+			status = "okay";
+		};
+	};
+};
