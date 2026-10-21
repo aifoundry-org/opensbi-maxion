@@ -4,4 +4,5 @@ validation/**/*.log binary
 validation/** -whitespace
 patches/*.patch -whitespace
 diagnostics/*.patch -whitespace
+licenses/OPENSBI-BINARY-NOTICES.txt -whitespace
 legacy/* -whitespace

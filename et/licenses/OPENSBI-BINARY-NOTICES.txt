@@ -1,0 +1,2126 @@
+OpenSBI binary distribution notices
+===================================
+
+This supplements COPYING.BSD and ThirdPartyNotices.md. It retains individual
+upstream notices from tracked firmware/, include/, lib/ and platform/ files.
+Coverage is deliberately broader than the linked generic RV64 firmware:
+uncompiled platforms, tests and RV32 helpers may appear. This does not assert
+that all listed components are present in the firmware.
+
+BSD-2-Clause is the selected license for libfdt's disjunctively dual-licensed
+sources. The full BSD-2-Clause and BSD-3-Clause conditions/disclaimers are
+included below. Per-file source notices are reproduced as comments, not code.
+Build-only Kconfiglib/scripts and downstream et/ diagnostics are outside this
+binary-source scope; their licenses are not changed.
+
+Regenerate/check using: python3 et/ci/binary-notices.py [--check]
+
+BSD-2-Clause: upstream COPYING.BSD
+=================================
+
+The 2-Clause BSD License
+SPDX short identifier: BSD-2-Clause
+
+Copyright (c) 2019 Western Digital Corporation or its affiliates and other
+contributors.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Upstream ThirdPartyNotices.md
+============================
+
+Copyright (c) 2019 Western Digital Corporation or its affiliates.
+
+Third Party Notices
+===================
+
+This project includes or partly uses code from the following open source
+software subject to the following open source licenses.
+
+libfdt
+------
+
+Copyright (C) 2016 Free Electrons
+Copyright (C) 2016 NextThing Co.
+
+The libfdt source code is disjunctively dual licensed (GPL-2.0+ or
+BSD-2-Clause). Some of this project code is used in OpenSBI under the terms of
+the BSD 2-Clause license. The full text of this license can be found in the
+file [COPYING.BSD](COPYING.BSD).
+
+BSD-3-Clause: HTIF and Berkeley arithmetic notices and terms
+==========================================================
+
+HTIF (lib/utils/sys/htif.c and include/sbi_utils/sys/htif.h):
+Copyright (c) 2010-2020, The Regents of the University of California
+(Regents).  All Rights Reserved.
+
+The following complete BSD-3-Clause terms are retained verbatim from
+lib/utils/libquad/qdivrem.c (comment delimiters removed). They include
+the Berkeley arithmetic attribution as well as all three conditions
+and the Regents' disclaimer:
+
+Copyright (c) 1992, 1993
+	The Regents of the University of California.  All rights reserved.
+
+This software was developed by the Computer Systems Engineering group
+at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
+contributed to Berkeley.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. Neither the name of the University nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+
+Individual source notices
+=========================
+
+Identical notice blocks are grouped; paths identify their source files.
+
+Files:
+  firmware/Kconfig
+  lib/sbi/Kconfig
+  lib/utils/Kconfig
+  lib/utils/cache/Kconfig
+  lib/utils/cppc/Kconfig
+  lib/utils/fdt/Kconfig
+  lib/utils/gpio/Kconfig
+  lib/utils/hsm/Kconfig
+  lib/utils/i2c/Kconfig
+  lib/utils/ipi/Kconfig
+  lib/utils/irqchip/Kconfig
+  lib/utils/libfdt/Kconfig
+  lib/utils/mailbox/Kconfig
+  lib/utils/mpxy/Kconfig
+  lib/utils/regmap/Kconfig
+  lib/utils/reset/Kconfig
+  lib/utils/serial/Kconfig
+  lib/utils/suspend/Kconfig
+  lib/utils/sys/Kconfig
+  lib/utils/timer/Kconfig
+  platform/generic/Kconfig
+  platform/generic/andes/Kconfig
+  platform/generic/eswin/Kconfig
+  platform/generic/thead/Kconfig
+  platform/nuclei/ux600/Kconfig
+  platform/template/Kconfig
+
+# SPDX-License-Identifier: BSD-2-Clause
+
+Files:
+  firmware/external_deps.mk
+  firmware/objects.mk
+  firmware/payloads/objects.mk
+  lib/sbi/objects.mk
+  lib/utils/irqchip/objects.mk
+  lib/utils/serial/objects.mk
+  lib/utils/sys/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2019 Western Digital Corporation or its affiliates.
+#
+# Authors:
+#   Anup Patel <anup.patel@wdc.com>
+#
+
+Files:
+  firmware/fw_base.S
+  firmware/fw_base.ldS
+  firmware/fw_dynamic.S
+  firmware/fw_dynamic.elf.ldS
+  firmware/fw_jump.S
+  firmware/fw_jump.elf.ldS
+  firmware/fw_payload.S
+  firmware/fw_payload.elf.ldS
+  firmware/payloads/test.elf.ldS
+  firmware/payloads/test_head.S
+  firmware/payloads/test_main.c
+  include/sbi/fw_dynamic.h
+  include/sbi/riscv_asm.h
+  include/sbi/riscv_atomic.h
+  include/sbi/riscv_barrier.h
+  include/sbi/riscv_encoding.h
+  include/sbi/riscv_fp.h
+  include/sbi/riscv_io.h
+  include/sbi/sbi_console.h
+  include/sbi/sbi_const.h
+  include/sbi/sbi_ecall.h
+  include/sbi/sbi_ecall_interface.h
+  include/sbi/sbi_emulate_csr.h
+  include/sbi/sbi_error.h
+  include/sbi/sbi_hart.h
+  include/sbi/sbi_illegal_insn.h
+  include/sbi/sbi_init.h
+  include/sbi/sbi_ipi.h
+  include/sbi/sbi_platform.h
+  include/sbi/sbi_scratch.h
+  include/sbi/sbi_system.h
+  include/sbi/sbi_timer.h
+  include/sbi/sbi_trap.h
+  include/sbi/sbi_trap_ldst.h
+  include/sbi/sbi_types.h
+  include/sbi/sbi_unpriv.h
+  include/sbi/sbi_version.h
+  include/sbi_utils/irqchip/plic.h
+  include/sbi_utils/serial/sifive-uart.h
+  include/sbi_utils/serial/uart8250.h
+  lib/sbi/riscv_asm.c
+  lib/sbi/riscv_atomic.c
+  lib/sbi/riscv_hardfp.S
+  lib/sbi/sbi_console.c
+  lib/sbi/sbi_ecall.c
+  lib/sbi/sbi_emulate_csr.c
+  lib/sbi/sbi_hart.c
+  lib/sbi/sbi_illegal_insn.c
+  lib/sbi/sbi_init.c
+  lib/sbi/sbi_pmp.c
+  lib/sbi/sbi_scratch.c
+  lib/sbi/sbi_timer.c
+  lib/sbi/sbi_trap.c
+  lib/sbi/sbi_trap_ldst.c
+  lib/sbi/sbi_unpriv.c
+  lib/utils/serial/sifive-uart.c
+  lib/utils/serial/uart8250.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  include/sbi/riscv_dbtr.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Ventana Micro System, Inc.
+ *
+ * Authors:
+ *   Himanshu Chauhan <hchauhan@ventanamicro.com>
+ */
+
+Files:
+  include/sbi/riscv_locks.h
+  lib/sbi/riscv_locks.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ * Copyright (c) 2021 Christoph Müllner <cmuellner@linux.com>
+ */
+
+Files:
+  include/sbi/sbi_bitmap.h
+  include/sbi/sbi_domain.h
+  include/sbi/sbi_hartmask.h
+  include/sbi_utils/irqchip/fdt_irqchip.h
+  include/sbi_utils/serial/fdt_serial.h
+  include/sbi_utils/timer/fdt_timer.h
+  lib/sbi/sbi_bitmap.c
+  lib/sbi/sbi_domain.c
+  lib/sbi/sbi_expected_trap.S
+  lib/utils/irqchip/fdt_irqchip.c
+  lib/utils/irqchip/fdt_irqchip_plic.c
+  lib/utils/reset/fdt_reset_htif.c
+  lib/utils/serial/fdt_serial.c
+  lib/utils/serial/fdt_serial_htif.c
+  lib/utils/serial/fdt_serial_sifive.c
+  lib/utils/serial/fdt_serial_uart8250.c
+  lib/utils/timer/fdt_timer.c
+  platform/generic/include/platform_override.h
+  platform/generic/platform.c
+  platform/generic/sifive/fu540.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  include/sbi/sbi_bitops.h
+  include/sbi/sbi_string.h
+  lib/sbi/sbi_string.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Atish Patra <atish.patra@wdc.com>
+ */
+
+Files:
+  include/sbi/sbi_byteorder.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Ventana Micro Systems Inc.
+ */
+
+Files:
+  include/sbi/sbi_cppc.h
+  lib/sbi/sbi_cppc.c
+  lib/sbi/sbi_ecall_cppc.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Ventana Micro Systems Inc.
+ *
+ */
+
+Files:
+  include/sbi/sbi_csr_detect.h
+  include/sbi/sbi_hsm.h
+  include/sbi/sbi_math.h
+  lib/sbi/sbi_ecall_hsm.c
+  lib/sbi/sbi_hsm.c
+  lib/sbi/sbi_platform.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Atish Patra <atish.patra@wdc.com>
+ */
+
+Files:
+  include/sbi/sbi_dbtr.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Ventana Micro Systems, Inc.
+ *
+ * Authors:
+ *   Himanshu Chauhan <hchauhan@ventanamicro.com>
+ */
+
+Files:
+  include/sbi/sbi_domain_context.h
+  lib/sbi/sbi_domain_context.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) IPADS@SJTU 2023. All rights reserved.
+ */
+
+Files:
+  include/sbi/sbi_domain_state.h
+  lib/sbi/sbi_domain_state.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 Ventana Micro Systems Inc.
+ */
+
+Files:
+  include/sbi/sbi_double_trap.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 Rivos Inc.
+ *
+ * Authors:
+ *   Clément Léger <cleger@rivosinc.com>
+ */
+
+Files:
+  include/sbi/sbi_fifo.h
+  lib/sbi/sbi_fifo.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Atish Patra<atish.patra@wdc.com>
+ *
+ */
+
+Files:
+  include/sbi/sbi_fp.h
+  include/sbi/sbi_vector.h
+  lib/sbi/sbi_fp.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2026 RISCstar Solutions.
+ *
+ * Authors:
+ *   Dave Patel <dave.patel@riscstar.com>
+ */
+
+Files:
+  include/sbi/sbi_fwft.h
+  lib/sbi/sbi_ecall_fwft.c
+  lib/sbi/sbi_fwft.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 Rivos Inc.
+ *
+ * Authors:
+ *   Clément Léger <cleger@rivosinc.com>
+ */
+
+Files:
+  include/sbi/sbi_hart_pmp.h
+  include/sbi/sbi_hart_protection.h
+  lib/sbi/sbi_hart_pmp.c
+  lib/sbi/sbi_hart_protection.c
+  lib/utils/mpxy/fdt_mpxy_rpmi_sysmsi.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 Ventana Micro Systems Inc.
+ */
+
+Files:
+  include/sbi/sbi_heap.h
+  lib/sbi/sbi_heap.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Anup Patel<apatel@ventanamicro.com>
+ */
+
+Files:
+  include/sbi/sbi_hfence.h
+  include/sbi/sbi_tlb.h
+  lib/sbi/sbi_tlb.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Atish Patra <atish.patra@wdc.com>
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  include/sbi/sbi_illegal_atomic.h
+  lib/sbi/sbi_illegal_atomic.c
+  platform/generic/include/mips/mips-cm.h
+  platform/generic/include/mips/p8700.h
+  platform/generic/mips/boston.c
+  platform/generic/mips/mips_warm_boot.S
+  platform/generic/mips/p8700.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 MIPS
+ *
+ */
+
+Files:
+  include/sbi/sbi_irqchip.h
+  lib/sbi/sbi_ecall_dbcn.c
+  lib/sbi/sbi_irqchip.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Anup Patel <apatel@ventanamicro.com>
+ */
+
+Files:
+  include/sbi/sbi_list.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Simple doubly-linked list library.
+ *
+ * Adapted from Xvisor source file libs/include/libs/list.h
+ *
+ * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  include/sbi/sbi_mpxy.h
+  lib/sbi/sbi_mpxy.c
+  lib/utils/reset/fdt_reset_rpmi.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Rahul Pathak <rpathak@ventanamicro.com>
+ */
+
+Files:
+  include/sbi/sbi_pmp.h
+  platform/generic/include/tenstorrent/ascalon.h
+  platform/generic/include/tenstorrent/pma.h
+  platform/generic/tenstorrent/ascalon.c
+  platform/generic/tenstorrent/atlantis.c
+  platform/generic/tenstorrent/pma.c
+
+/*
+ * SPDX-FileCopyrightText: (c) 2025-2026 Tenstorrent USA, Inc.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
+Files:
+  include/sbi/sbi_pmu.h
+  lib/sbi/sbi_ecall_pmu.c
+  lib/sbi/sbi_pmu.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Atish Patra <atish.patra@wdc.com>
+ */
+
+Files:
+  include/sbi/sbi_slist.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Simple simply-linked list library.
+ *
+ * Copyright (c) 2025 Rivos Inc.
+ *
+ * Authors:
+ *   Clément Léger <cleger@rivosinc.com>
+ */
+
+Files:
+  include/sbi/sbi_sse.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Rivos Systems.
+ */
+
+Files:
+  include/sbi/sbi_ubsan.h
+  lib/sbi/tests/sbi_ubsan_test.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Author: Marcos Oduardo <marcos.oduardo@gmail.com>
+ */
+
+Files:
+  include/sbi/sbi_unit_test.h
+  lib/sbi/tests/sbi_bitmap_test.c
+  lib/sbi/tests/sbi_console_test.c
+  lib/sbi/tests/sbi_unit_test.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Author: Ivan Orlov <ivan.orlov0322@gmail.com>
+ */
+
+Files:
+  include/sbi/sbi_visibility.h
+  lib/utils/hsm/fdt_hsm_sifive_tmc0.c
+  lib/utils/suspend/fdt_suspend_sifive_smc0.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 SiFive
+ */
+
+Files:
+  include/sbi_utils/cache/cache.h
+  include/sbi_utils/cache/fdt_cache.h
+  include/sbi_utils/cache/fdt_cmo_helper.h
+  include/sbi_utils/hsm/fdt_hsm_sifive_inst.h
+  include/sbi_utils/hsm/fdt_hsm_sifive_tmc0.h
+  lib/utils/cache/cache.c
+  lib/utils/cache/fdt_cache.c
+  lib/utils/cache/fdt_cmo_helper.c
+  lib/utils/cache/fdt_sifive_ccache.c
+  lib/utils/cache/fdt_sifive_ec.c
+  lib/utils/cache/fdt_sifive_pl2.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 SiFive Inc.
+ */
+
+Files:
+  include/sbi_utils/fdt/fdt_domain.h
+  lib/utils/fdt/fdt_domain.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * fdt_domain.c - Flat Device Tree Domain helper routines
+ *
+ * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  include/sbi_utils/fdt/fdt_driver.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * fdt_driver.h - Generic support for initializing drivers from DT nodes.
+ *
+ * Copyright (c) 2024 SiFive
+ */
+
+Files:
+  include/sbi_utils/fdt/fdt_fixup.h
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * fdt_fixup.h - Flat Device Tree manipulation helper routines
+ * Implement platform specific DT fixups on top of libfdt. 
+ *
+ * Copyright (C) 2020 Bin Meng <bmeng.cn@gmail.com>
+ */
+
+Files:
+  include/sbi_utils/fdt/fdt_helper.h
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * fdt_helper.h - Flat Device Tree parsing helper routines
+ * Implement helper routines to parse FDT nodes on top of
+ * libfdt for OpenSBI usage
+ *
+ * Copyright (C) 2020 Bin Meng <bmeng.cn@gmail.com>
+ */
+
+Files:
+  include/sbi_utils/fdt/fdt_pmu.h
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * fdt_pmu.c - Flat Device Tree PMU helper routines
+ *
+ * Copyright (c) 2021 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Atish Patra <atish.patra@wdc.com>
+ */
+
+Files:
+  include/sbi_utils/gpio/fdt_gpio.h
+  include/sbi_utils/gpio/gpio.h
+  include/sbi_utils/ipi/aclint_mswi.h
+  include/sbi_utils/timer/aclint_mtimer.h
+  lib/utils/gpio/fdt_gpio.c
+  lib/utils/gpio/gpio.c
+  lib/utils/ipi/aclint_mswi.c
+  lib/utils/ipi/fdt_ipi_mswi.c
+  lib/utils/timer/aclint_mtimer.c
+  lib/utils/timer/fdt_timer_mtimer.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  include/sbi_utils/hsm/fdt_hsm_andes_atcsmu.h
+  lib/utils/cache/fdt_andes_llcache.c
+  lib/utils/hsm/fdt_hsm_andes_atcsmu.c
+  lib/utils/reset/fdt_reset_atcwdt200.c
+  lib/utils/suspend/fdt_suspend_andes_atcsmu.c
+  platform/generic/andes/ae350.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 Andes Technology Corporation
+ */
+
+Files:
+  include/sbi_utils/i2c/dw_i2c.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 StarFive Technology Co., Ltd.
+ *
+ * Author: Minda Chen <minda.chen@starfivetech.com>
+ */
+
+Files:
+  include/sbi_utils/i2c/fdt_i2c.h
+  include/sbi_utils/i2c/i2c.h
+  lib/utils/i2c/fdt_i2c_sifive.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 YADRO
+ *
+ * Authors:
+ *   Nikita Shubin <n.shubin@yadro.com>
+ */
+
+Files:
+  include/sbi_utils/ipi/andes_plicsw.h
+  lib/utils/ipi/andes_plicsw.c
+  lib/utils/ipi/fdt_ipi_plicsw.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 Andes Technology Corporation
+ *
+ * Authors:
+ *   Zong Li <zong@andestech.com>
+ *   Nylon Chen <nylon7@andestech.com>
+ *   Leo Yu-Chi Liang <ycliang@andestech.com>
+ *   Yu Chien Peter Lin <peterlin@andestech.com>
+ */
+
+Files:
+  include/sbi_utils/irqchip/aplic.h
+  include/sbi_utils/irqchip/imsic.h
+  lib/utils/irqchip/aplic.c
+  lib/utils/irqchip/fdt_irqchip_aplic.c
+  lib/utils/irqchip/fdt_irqchip_imsic.c
+  lib/utils/irqchip/imsic.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 Western Digital Corporation or its affiliates.
+ * Copyright (c) 2022 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  include/sbi_utils/mailbox/fdt_mailbox.h
+  include/sbi_utils/mailbox/mailbox.h
+  include/sbi_utils/mpxy/fdt_mpxy.h
+  include/sbi_utils/mpxy/fdt_mpxy_rpmi_mbox.h
+  lib/sbi/sbi_ecall_mpxy.c
+  lib/utils/mailbox/fdt_mailbox.c
+  lib/utils/mailbox/mailbox.c
+  lib/utils/mpxy/fdt_mpxy.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Anup Patel <apatel@ventanamicro.com>
+ */
+
+Files:
+  include/sbi_utils/mailbox/rpmi_mailbox.h
+  include/sbi_utils/regmap/fdt_regmap.h
+  include/sbi_utils/regmap/regmap.h
+  lib/utils/mailbox/rpmi_mailbox.c
+  lib/utils/regmap/fdt_regmap.c
+  lib/utils/regmap/fdt_regmap_syscon.c
+  lib/utils/regmap/regmap.c
+  lib/utils/reset/fdt_reset_syscon.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Anup Patel <apatel@ventanamicro.com>
+ */
+
+Files:
+  include/sbi_utils/mailbox/rpmi_msgprot.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Rahul Pathak <rpathak@ventanamicro.com>
+ *   Subrahmanya Lingappa <slingappa@ventanamicro.com>
+ */
+
+Files:
+  include/sbi_utils/serial/altr-juart.h
+  lib/utils/serial/altr-juart.c
+  lib/utils/serial/fdt_serial_altr_juart.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 ISCAS
+ *
+ * Authors:
+ *   Icenowy Zheng <zhengxingda@iscas.ac.cn>
+ */
+
+Files:
+  include/sbi_utils/serial/cadence-uart.h
+  lib/utils/serial/cadence-uart.c
+  lib/utils/serial/fdt_serial_cadence.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 StarFive Technology Co., Ltd.
+ *
+ * Author: Jun Liang Tan <junliang.tan@linux.starfivetech.com>
+ */
+
+Files:
+  include/sbi_utils/serial/gaisler-uart.h
+  lib/utils/serial/fdt_serial_gaisler.c
+  lib/utils/serial/gaisler-uart.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 Cobham Gaisler AB.
+ *
+ * Authors:
+ *   Daniel Cederman <cederman@gaisler.com>
+ */
+
+Files:
+  include/sbi_utils/serial/litex-uart.h
+  lib/utils/serial/fdt_serial_litex.c
+  lib/utils/serial/litex-uart.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 Gabriel Somlo
+ *
+ * Authors:
+ *   Gabriel Somlo <gsomlo@gmail.com>
+ */
+
+Files:
+  include/sbi_utils/serial/renesas-scif.h
+
+/* SPDX-License-Identifier: BSD-2-Clause */
+
+/*
+ * Copyright (C) 2022 Renesas Electronics Corporation
+ */
+
+Files:
+  include/sbi_utils/serial/semihosting.h
+  lib/utils/serial/semihosting.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Anup Patel <apatel@ventanamicro.com>
+ *   Kautuk Consul <kconsul@ventanamicro.com>
+ */
+
+Files:
+  include/sbi_utils/serial/shakti-uart.h
+  lib/utils/serial/shakti-uart.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2020 Vijai Kumar K <vijai@behindbytes.com>
+ */
+
+Files:
+  include/sbi_utils/serial/xlnx_uartlite.h
+  lib/utils/serial/fdt_serial_xlnx_uartlite.c
+  lib/utils/serial/xlnx-uartlite.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Alistair Francis <alistair.francis@wdc.com>
+ */
+
+Files:
+  include/sbi_utils/sys/htif.h
+  lib/utils/sys/htif.c
+
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright (c) 2010-2020, The Regents of the University of California
+ * (Regents).  All Rights Reserved.
+ */
+
+Files:
+  include/sbi_utils/timer/andes_plmt.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 Andes Technology Corporation
+ *
+ * Authors:
+ *   Zong Li <zong@andestech.com>
+ *   Nylon Chen <nylon7@andestech.com>
+ *   Yu Chien Peter Lin <peterlin@andestech.com>
+ */
+
+Files:
+  lib/sbi/sbi_bitops.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Atish Patra <atish.patra@wdc.com>
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  lib/sbi/sbi_dbtr.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Ventana Micro Systems, Inc.
+ *
+ * Author(s):
+ *   Himanshu Chauhan <hchauhan@ventanamicro.com>
+ */
+
+Files:
+  lib/sbi/sbi_double_trap.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 Rivos Inc.
+ *
+ * Authors:
+ *   Clément Léger <clement.leger@rivosinc.com>
+ */
+
+Files:
+  lib/sbi/sbi_ecall_base.c
+  lib/sbi/sbi_ecall_ipi.c
+  lib/sbi/sbi_ecall_legacy.c
+  lib/sbi/sbi_ecall_rfence.c
+  lib/sbi/sbi_ecall_srst.c
+  lib/sbi/sbi_ecall_time.c
+  lib/sbi/sbi_ecall_vendor.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ *   Atish Patra <atish.patra@wdc.com>
+ */
+
+Files:
+  lib/sbi/sbi_ecall_dbtr.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Ventana Micro Systems Inc.
+ *
+ * Author(s):
+ *   Himanshu Chauhan <hchauhan@ventanamicro.com>
+ */
+
+Files:
+  lib/sbi/sbi_ecall_susp.c
+  platform/generic/include/andes/andes_sbi.h
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+Files:
+  lib/sbi/sbi_hfence.S
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ *   Atish Patra <anup.patel@wdc.com>
+ */
+
+Files:
+  lib/sbi/sbi_ipi.c
+  lib/sbi/sbi_system.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ *   Nick Kossifidis <mick@ics.forth.gr>
+ */
+
+Files:
+  lib/sbi/sbi_math.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+ *
+ * Common helper functions used across OpenSBI project.
+ *
+ * Authors:
+ *   Atish Patra <atish.patra@wdc.com>
+ */
+
+Files:
+  lib/sbi/sbi_sse.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Rivos Systems Inc.
+ *
+ */
+
+Files:
+  lib/sbi/sbi_trap_v_ldst.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 SiFive Inc.
+ *
+ * Authors:
+ *   Andrew Waterman <andrew@sifive.com>
+ *   Nylon Chen <nylon.chen@sifive.com>
+ *   Zong Li <nylon.chen@sifive.com>
+ */
+
+Files:
+  lib/sbi/sbi_ubsan.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2018 The NetBSD Foundation, Inc.
+ *
+ * Author: Marcos Oduardo <marcos.oduardo@gmail.com>
+ */
+
+Files:
+  lib/sbi/sbi_vector.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2026 RISCstar Solutions.
+ *
+ * Authors:
+ *	 Dave Patel <dave.patel@riscstar.com>
+ */
+
+Files:
+  lib/sbi/tests/sbi_bitops_test.c
+
+/*
+* SPDX-License-Identifier: BSD-2-Clause
+*
+* Copyright 2025 Beijing ESWIN Computing Technology Co., Ltd.
+*
+* Author: Dongdong Zhang <zhangdongdong@eswincomputing.com>
+*/
+
+Files:
+  lib/sbi/tests/sbi_math_test.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright  2024  Beijing ESWIN Computing Technology Co., Ltd.
+ *
+ * Author: Dongdong Zhang <zhangdongdong@eswincomputing.com>
+ */
+
+Files:
+  lib/sbi/tests/sbi_string_test.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Author: Chen Pei <cp0613@linux.alibaba.com>
+ */
+
+Files:
+  lib/utils/cache/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2025 SiFive
+#
+
+Files:
+  lib/utils/cppc/fdt_cppc_rpmi.c
+  lib/utils/hsm/fdt_hsm_rpmi.c
+  lib/utils/suspend/fdt_suspend_rpmi.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Subrahmanya Lingappa <slingappa@ventanamicro.com>
+ */
+
+Files:
+  lib/utils/cppc/objects.mk
+  lib/utils/hsm/objects.mk
+  lib/utils/mailbox/objects.mk
+  lib/utils/mpxy/objects.mk
+  lib/utils/suspend/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2024 Ventana Micro Systems Inc.
+#
+# Authors:
+#   Anup Patel <apatel@ventanamicro.com>
+#
+
+Files:
+  lib/utils/fdt/fdt_driver.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 SiFive
+ */
+
+Files:
+  lib/utils/fdt/fdt_fixup.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * fdt_fixup.c - Flat Device Tree parsing helper routines
+ * Implement helper routines to parse FDT nodes on top of
+ * libfdt for OpenSBI usage
+ *
+ * Copyright (C) 2020 Bin Meng <bmeng.cn@gmail.com>
+ */
+
+Files:
+  lib/utils/fdt/fdt_helper.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * fdt_helper.c - Flat Device Tree manipulation helper routines
+ * Implement helper routines on top of libfdt for OpenSBI usage
+ *
+ * Copyright (C) 2020 Bin Meng <bmeng.cn@gmail.com>
+ */
+
+Files:
+  lib/utils/fdt/fdt_pmu.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * fdt_pmu.c - Flat Device Tree PMU helper routines
+ *
+ * Copyright (c) 2021 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *	Atish Patra <atish.patra@wdc.com>
+ */
+
+Files:
+  lib/utils/fdt/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (C) 2020 Bin Meng <bmeng.cn@gmail.com>
+#
+
+Files:
+  lib/utils/gpio/fdt_gpio_designware.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 SiFive
+ *
+ * GPIO driver for Synopsys DesignWare APB GPIO
+ *
+ * Authors:
+ *   Ben Dooks <ben.dooks@sifive.com>
+ */
+
+Files:
+  lib/utils/gpio/fdt_gpio_sifive.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 SiFive
+ *
+ * Authors:
+ *   Green Wan <green.wan@sifive.com>
+ */
+
+Files:
+  lib/utils/gpio/fdt_gpio_starfive.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 Starfive
+ *
+ * Authors:
+ *   Minda.chen <Minda.chen@starfivetech.com>
+ */
+
+Files:
+  lib/utils/gpio/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2021 Western Digital Corporation or its affiliates.
+#
+# Authors:
+#   Anup Patel <anup.patel@wdc.com>
+#
+
+Files:
+  lib/utils/hsm/fdt_hsm_spacemit.c
+  platform/generic/spacemit/k1.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 SpacemiT
+ * Authors:
+ *   Xianbin Zhu <xianbin.zhu@linux.spacemit.com>
+ *   Troy Mitchell <troy.mitchell@linux.spacemit.com>
+ */
+
+Files:
+  lib/utils/i2c/dw_i2c.c
+  lib/utils/i2c/fdt_i2c_dw.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 starfivetech.com
+ *
+ * Authors:
+ *   Minda Chen <minda.chen@starfivetech.com>
+ */
+
+Files:
+  lib/utils/i2c/fdt_i2c.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 YADRO
+ *
+ * Authors:
+ *   Nikita Shubin <n.shubin@yadro.com>
+ *
+ * derivate: lib/utils/gpio/fdt_gpio.c
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  lib/utils/i2c/fdt_i2c_spacemit.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2026 Aurelien Jarno
+ *
+ * Authors:
+ *   Aurelien Jarno <aurelien@aurel32.net>
+ */
+
+Files:
+  lib/utils/i2c/i2c.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 YADRO
+ *
+ * Authors:
+ *   Nikita Shubin <n.shubin@yadro.com>
+ *
+ * derivate: lib/utils/gpio/gpio.c
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  lib/utils/i2c/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2021 YADRO
+#
+# Authors:
+#   Nikita Shubin <n.shubin@yadro.com>
+#
+
+Files:
+  lib/utils/ipi/objects.mk
+  lib/utils/reset/objects.mk
+  lib/utils/timer/objects.mk
+  platform/generic/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2020 Western Digital Corporation or its affiliates.
+#
+# Authors:
+#   Anup Patel <anup.patel@wdc.com>
+#
+
+Files:
+  lib/utils/irqchip/plic.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Anup Patel <anup.patel@wdc.com>
+ *   Samuel Holland <samuel@sholland.org>
+ */
+
+Files:
+  lib/utils/libfdt/Makefile.libfdt
+
+# SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause
+# Makefile.libfdt
+#
+# This is not a complete Makefile of itself.  Instead, it is designed to
+# be easily embeddable into other systems of Makefiles.
+#
+
+Files:
+  lib/utils/libfdt/fdt.c
+  lib/utils/libfdt/fdt_check.c
+  lib/utils/libfdt/fdt_ro.c
+  lib/utils/libfdt/fdt_rw.c
+  lib/utils/libfdt/fdt_sw.c
+  lib/utils/libfdt/fdt_wip.c
+
+// SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause
+
+/*
+ * libfdt - Flat Device Tree manipulation
+ * Copyright (C) 2006 David Gibson, IBM Corporation.
+ */
+
+Files:
+  lib/utils/libfdt/fdt.h
+  lib/utils/libfdt/libfdt_env.h
+
+/* SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause */
+
+/*
+ * libfdt - Flat Device Tree manipulation
+ * Copyright (C) 2006 David Gibson, IBM Corporation.
+ * Copyright 2012 Kim Phillips, Freescale Semiconductor.
+ */
+
+Files:
+  lib/utils/libfdt/fdt_addresses.c
+
+// SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause
+
+/*
+ * libfdt - Flat Device Tree manipulation
+ * Copyright (C) 2014 David Gibson <david@gibson.dropbear.id.au>
+ * Copyright (C) 2018 embedded brains GmbH
+ */
+
+Files:
+  lib/utils/libfdt/fdt_empty_tree.c
+
+// SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause
+
+/*
+ * libfdt - Flat Device Tree manipulation
+ * Copyright (C) 2012 David Gibson, IBM Corporation.
+ */
+
+Files:
+  lib/utils/libfdt/fdt_overlay.c
+
+// SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause
+
+/*
+ * libfdt - Flat Device Tree manipulation
+ * Copyright (C) 2016 Free Electrons
+ * Copyright (C) 2016 NextThing Co.
+ */
+
+Files:
+  lib/utils/libfdt/fdt_strerror.c
+
+// SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause
+
+/*
+ * libfdt - Flat Device Tree manipulation
+ * Copyright (C) 2006 David Gibson, IBM Corporation.
+ *     EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+Files:
+  lib/utils/libfdt/libfdt.h
+  lib/utils/libfdt/libfdt_internal.h
+
+/* SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause */
+
+/*
+ * libfdt - Flat Device Tree manipulation
+ * Copyright (C) 2006 David Gibson, IBM Corporation.
+ */
+
+Files:
+  lib/utils/libfdt/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2019 Western Digital Corporation or its affiliates.
+#
+# Authors:
+#   Atish Patra<atish.patra@wdc.com>
+#
+
+Files:
+  lib/utils/libfdt/version.lds
+
+/* SPDX-License-Identifier: GPL-2.0-or-later OR BSD-2-Clause */
+
+Files:
+  lib/utils/libquad/divdi3.c
+  lib/utils/libquad/moddi3.c
+  lib/utils/libquad/qdivrem.c
+  lib/utils/libquad/udivdi3.c
+  lib/utils/libquad/umoddi3.c
+
+/*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright (c) 1992, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * This software was developed by the Computer Systems Engineering group
+ * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
+ * contributed to Berkeley.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+Files:
+  lib/utils/libquad/include/limits.h
+  lib/utils/libquad/include/sys/cdefs.h
+  lib/utils/libquad/include/sys/types.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 Jessica Clarke <jrtc27@jrtc27.com>
+ */
+
+Files:
+  lib/utils/libquad/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2021 Jessica Clarke <jrtc27@jrtc27.com>
+#
+
+Files:
+  lib/utils/libquad/quad.h
+
+/*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright (c) 1992, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * This software was developed by the Computer Systems Engineering group
+ * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
+ * contributed to Berkeley.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	@(#)quad.h	8.1 (Berkeley) 6/4/93
+ * $FreeBSD$
+ */
+
+Files:
+  lib/utils/mailbox/fdt_mailbox_rpmi_shmem.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Rahul Pathak <rpathak@ventanamicro.com>
+ *   Subrahmanya Lingappa <slingappa@ventanamicro.com>
+ *   Anup Patel <apatel@ventanamicro.com>
+ */
+
+Files:
+  lib/utils/mpxy/fdt_mpxy_rpmi_clock.c
+  lib/utils/mpxy/fdt_mpxy_rpmi_mbox.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2024 Ventana Micro Systems Inc.
+ *
+ * Authors:
+ *   Rahul Pathak <rpathak@ventanamicro.com>
+ *   Anup Patel <apatel@ventanamicro.com>
+ */
+
+Files:
+  lib/utils/mpxy/fdt_mpxy_rpmi_logging.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2026 Qualcomm, Inc
+ *
+ * Authors:
+ *   Subrahmanya Lingappa <subrahmanya.lingappa@oss.qualcomm.com>
+ */
+
+Files:
+  lib/utils/mpxy/fdt_mpxy_rpmi_mm.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2026 Qualcomm Technologies, Inc.
+ *
+ * Authors:
+ *   Ranbir Singh <ranbir.singh@oss.qualcomm.com>
+ *   Sunil V L <sunilvl@oss.qualcomm.com>
+ */
+
+Files:
+  lib/utils/regmap/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2023 Ventana Micro Systems Inc.
+#
+# Authors:
+#   Anup Patel <apatel@ventanamicro.com>
+#
+
+Files:
+  lib/utils/reset/fdt_reset_gpio.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 SiFive
+ * Copyright (c) 2021 Western Digital Corporation or its affiliates.
+ *
+ * Authors:
+ *   Green Wan <green.wan@sifive.com>
+ *   Anup Patel <anup.patel@wdc.com>
+ */
+
+Files:
+  lib/utils/reset/fdt_reset_litex.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2026 Inochi Amaoto <inochiama@gmail.com>
+ */
+
+Files:
+  lib/utils/reset/fdt_reset_metanoia.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2026 Metanoia Communications Inc.
+ *
+ */
+
+Files:
+  lib/utils/reset/fdt_reset_sg2042_hwmon_mcu.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2023 Lin Chunzhi <chunzhi.lin@sophgo.com>
+ */
+
+Files:
+  lib/utils/reset/fdt_reset_spacemit_p1.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2026 Aurelien Jarno
+ * Authors:
+ *   Aurelien Jarno <aurelien@aurel32.net>
+ */
+
+Files:
+  lib/utils/reset/fdt_reset_sunxi_wdt.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 Samuel Holland <samuel@sholland.org>
+ */
+
+Files:
+  lib/utils/serial/fdt_serial_renesas_scif.c
+  lib/utils/serial/renesas_scif.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * Copyright (C) 2022 Renesas Electronics Corporation
+ */
+
+Files:
+  lib/utils/serial/fdt_serial_shakti.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2020 Vijai Kumar K <vijai@behindbytes.com>
+ *
+ */
+
+Files:
+  lib/utils/timer/andes_plmt.c
+  lib/utils/timer/fdt_timer_plmt.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 Andes Technology Corporation
+ *
+ * Authors:
+ *   Yu Chien Peter Lin <peterlin@andestech.com>
+ */
+
+Files:
+  platform/generic/allwinner/objects.mk
+  platform/generic/andes/objects.mk
+  platform/generic/mips/objects.mk
+  platform/generic/sifive/objects.mk
+  platform/generic/spacemit/objects.mk
+  platform/generic/starfive/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+
+Files:
+  platform/generic/allwinner/sun20i-d1.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 Samuel Holland <samuel@sholland.org>
+ */
+
+Files:
+  platform/generic/andes/andes_pma.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * Copyright (C) 2023 Renesas Electronics Corp.
+ * Copyright (c) 2024 Andes Technology Corporation
+ *
+ * Authors:
+ *      Ben Zong-You Xie <ben717@andestech.com>
+ *      Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+ */
+
+Files:
+  platform/generic/andes/andes_pmu.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * andes_pmu.c - Andes PMU device callbacks and platform overrides
+ *
+ * Copyright (C) 2023 Andes Technology Corporation
+ */
+
+Files:
+  platform/generic/andes/andes_sbi.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * Copyright (C) 2023 Renesas Electronics Corp.
+ *
+ */
+
+Files:
+  platform/generic/andes/qilai.c
+  platform/generic/include/andes/qilai.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 Andes Technology Corporation
+ *
+ */
+
+Files:
+  platform/generic/eswin/eic770x.c
+  platform/generic/eswin/hfp.c
+  platform/generic/include/eswin/eic770x.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 Bo Gan <ganboing@gmail.com>
+ *
+ */
+
+Files:
+  platform/generic/eswin/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (C) 2025 Bo Gan <ganboing@gmail.com>
+#
+
+Files:
+  platform/generic/include/andes/andes.h
+
+/* SPDX-License-Identifier: BSD-2-Clause */
+
+/*
+ * Copyright (C) 2024 Andes Technology Corporation
+ */
+
+Files:
+  platform/generic/include/andes/andes_pma.h
+
+/* SPDX-License-Identifier: BSD-2-Clause */
+
+/*
+ * Copyright (C) 2023 Renesas Electronics Corp.
+ */
+
+Files:
+  platform/generic/include/andes/andes_pmu.h
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) Copyright (c) 2023 Andes Technology Corporation
+ */
+
+Files:
+  platform/generic/include/eswin/hfp.h
+
+// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+
+/*
+ * Copyright (c) 2024 Beijing ESWIN Computing Technology Co., Ltd.
+ *
+ * Authors:
+ *   Lin Min <linmin@eswincomputing.com>
+ *   Bo Gan <ganboing@gmail.com>
+ *
+ * Adapted from Core/Inc/hf_common.h from ESWIN's Hifive Premier P550
+ * onboard BMC (MCU) source repo:
+ *   https://github.com/eswincomputing/hifive-premier-p550-mcu-patches.git
+ *
+ */
+
+Files:
+  platform/generic/metanoia/mt2824/mt2824.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * Copyright (C) 2026 Metanoia Communication Inc.
+ *
+ * Authors:
+ *      Jun Chang <jun.chang@metanoia-comm.com>
+ */
+
+Files:
+  platform/generic/metanoia/mt2824/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (C) 2026 Metanoia Communication Inc.
+#
+
+Files:
+  platform/generic/mips/eyeq7h.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2025 Mobileye
+ *
+ */
+
+Files:
+  platform/generic/openhwgroup/ariane.c
+
+/* SPDX-License-Identifier: BSD-2-Clause */
+
+/*
+ * Copyright (C) 2019 FORTH-ICS/CARV
+ *				Panagiotis Peristerakis <perister@ics.forth.gr>
+ */
+
+Files:
+  platform/generic/openhwgroup/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2020 Western Digital Corporation or its affiliates.
+#
+
+Files:
+  platform/generic/openhwgroup/openpiton.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+ */
+
+Files:
+  platform/generic/renesas/rzfive/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (C) 2022 Renesas Electronics Corp.
+#
+
+Files:
+  platform/generic/renesas/rzfive/rzfive.c
+
+// SPDX-License-Identifier: BSD-2-Clause
+
+/*
+ * Copyright (C) 2022 Renesas Electronics Corp.
+ *
+ */
+
+Files:
+  platform/generic/sifive/fu740.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2021 SiFive
+ * Copyright (c) 2021 YADRO
+ *
+ * Authors:
+ *   David Abdurachmanov <david.abdurachmanov@sifive.com>
+ *   Nikita Shubin <n.shubin@yadro.com>
+ */
+
+Files:
+  platform/generic/sifive/sifive_dev_platform.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2026 SiFive Inc.
+ */
+
+Files:
+  platform/generic/sophgo/objects.mk
+  platform/generic/thead/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (C) 2023 Inochi Amaoto <inochiama@outlook.com>
+# Copyright (C) 2023 Alibaba Group Holding Limited.
+#
+
+Files:
+  platform/generic/sophgo/sg2042.c
+  platform/generic/thead/thead-generic.c
+  platform/generic/thead/thead_c9xx_errata_tlb_flush.c
+  platform/generic/thead/thead_c9xx_tlb_trap_handler.S
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Authors:
+ *   Inochi Amaoto <inochiama@outlook.com>
+ *
+ */
+
+Files:
+  platform/generic/starfive/jh7110.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2022 StarFive
+ *
+ * Authors:
+ *   Wei Liang Lim <weiliang.lim@starfivetech.com>
+ *   Minda Chen <minda.chen@starfivetech.com>
+ */
+
+Files:
+  platform/generic/tenstorrent/Kconfig
+
+# SPDX-FileCopyrightText: (c) 2025-2026 Tenstorrent USA, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+
+Files:
+  platform/generic/tenstorrent/objects.mk
+
+#
+# SPDX-FileCopyrightText: (c) 2025-2026 Tenstorrent USA, Inc.
+# SPDX-License-Identifier: BSD-2-Clause
+#
+
+Files:
+  platform/generic/thead/thead_c9xx_pmu.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Authors:
+ *   Inochi Amaoto <inochiama@outlook.com>
+ *   Haijiao Liu <haijiao.liu@sophgo.com>
+ *
+ */
+
+Files:
+  platform/nuclei/ux600/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2020 Nuclei Corporation or its affiliates.
+#
+# Authors:
+#   lujun <lujun@nuclesys.com>
+#   hqfang <578567190@qq.com>
+#
+
+Files:
+  platform/nuclei/ux600/platform.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) Nuclei Corporation or its affiliates.
+ *
+ * Authors:
+ *   lujun <lujun@nucleisys.com>
+ *   hqfang <578567190@qq.com>
+ */
+
+Files:
+  platform/template/objects.mk
+
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2019 Western Digital Corporation or its affiliates.
+#
+
+Files:
+  platform/template/platform.c
+
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ */

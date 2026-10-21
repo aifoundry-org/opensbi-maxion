@@ -39,6 +39,8 @@ rerunning. Never delete a published release merely to make a retry pass.
 
 Diagnostic workflow artifacts expire after 14 days. **The release assets are
 the consumer-facing files**, not those temporary workflow artifacts.
+Rerunning a workflow may replace its temporary workflow artifacts; it never
+replaces the separately published GitHub release assets.
 
 ## Published assets
 
@@ -52,6 +54,7 @@ the consumer-facing files**, not those temporary workflow artifacts.
 | `SHA256SUMS` | SHA-256 of every other attached asset |
 | `RELEASE-NOTES.md` | Reference identity and qualification limits |
 | `COPYING.BSD`, `ThirdPartyNotices.md`, `et-platform-LICENSE`, `et-platform-NOTICE` | License/notice material |
+| `OPENSBI-BINARY-NOTICES.txt` | Individual upstream copyright notices and BSD-2/BSD-3 license terms |
 
 `SHA256SUMS` intentionally does not checksum itself. The release manifest and
 checksums are integrity records, not standalone signatures or GitHub build
@@ -78,15 +81,31 @@ the runner's actual package provisioning and GitHub release publication.
 Local native compilation and mocked publication tests cannot prove those
 external services work.
 
-## 9front consumption
+## Linux and 9front consumption
 
-The intended host-side preparation pins the downstream tag, source commit,
-asset filename and expected binary SHA-256 **in the 9front repository**.
-Download the tagged `fw_jump.bin`, verify the independent pinned hash, and stage
-it separately from the kernel and DT. Never select “latest,” accept a checksum
-solely because it arrived beside an untrusted binary, or fetch firmware from
-the running Plan 9 kernel. A verified cached copy supports offline preparation.
-This workflow does not itself change the 9front consumer.
+Both OS workflows consume the **same** tagged `fw_jump.bin`; this is Maxion
+firmware, not a Plan-9-specific build. Each consuming project's host-side
+preparation pins the downstream tag, source commit, asset filename and expected
+binary SHA-256 **in that project's own repository or checked-in dependency
+manifest**.
+
+Download the tagged binary, verify the independently pinned hash, and stage it
+separately from the OS-specific assets:
+
+- **Linux:** kernel `Image`, Linux device tree, and initramfs when required by
+  the selected Linux boot configuration.
+- **Plan 9/9front:** the Maxion kernel (with its embedded boot filesystem) and
+  9front device tree; no Linux initramfs is used.
+
+Neither OS links OpenSBI into its kernel. The separately loaded firmware runs
+first and hands off through the shared [runtime contract](RUNTIME.md), including
+the fixed next-stage entry address. Each OS supplies a compatible external DT.
+
+Never select “latest,” accept a checksum solely because it arrived beside an
+untrusted binary, or fetch replacement firmware from the running guest kernel.
+A verified cached copy supports offline preparation. Updates are deliberate
+dependency-pin changes, with validation for each consuming OS.
+This workflow does not itself change either the Linux or the 9front consumer.
 
 ## Upstream check and source fingerprint
 

@@ -104,9 +104,11 @@ class ReleaseControls(unittest.TestCase):
     def test_positive_package_and_cli_verification(self):
         manifest = self.package()
         self.assertEqual(set(p.name for p in self.out.iterdir()), set(release.ASSETS))
-        self.assertEqual(len(release.ASSETS), 14)
+        self.assertEqual(len(release.ASSETS), 15)
         for name in ("COPYING.BSD", "ThirdPartyNotices.md"):
             self.assertEqual((self.out / name).read_bytes(), (self.root / name).read_bytes())
+        self.assertEqual((self.out / "OPENSBI-BINARY-NOTICES.txt").read_bytes(),
+                         (self.root / "et/licenses/OPENSBI-BINARY-NOTICES.txt").read_bytes())
         for name in (*release.OUTPUTS, "build-receipt.json"):
             self.assertEqual((self.out / name).read_bytes(), (self.build / name).read_bytes())
         self.assertEqual(manifest["commit"], self.source["commit"])
