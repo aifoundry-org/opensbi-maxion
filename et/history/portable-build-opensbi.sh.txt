@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
+# Offline Maxion fw_jump builder; intentionally no fetch, install or boot steps.
+set -euo pipefail
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+pin=6ad246a1494807ee91e36ffcf60e4c30bb309d45
+archive="vendor/opensbi-$pin.tar.gz"
+cross=${CROSS_COMPILE:-riscv64-linux-gnu-}
+jobs=${JOBS:-2}
+usage() {
+	printf '%s\n' "Usage: $0 [--verify-only | --out NEW-DIRECTORY]" \
+		"Default output: a new run-* directory under this package's ignored build/." \
+		"Environment: CROSS_COMPILE (PIE-capable GNU tool prefix), JOBS (default 2)."
+}
+mode=build
+out=
+case $# in
+0) ;;
+1) case $1 in
+	--verify-only) mode=verify ;;
+	-h|--help) usage; exit 0 ;;
+	*) usage >&2; exit 2 ;;
+	esac ;;
+2) if [[ $1 == --out && -n $2 ]]; then out=$2; else usage >&2; exit 2; fi ;;
+*) usage >&2; exit 2 ;;
+esac
+for tool in sha256sum python3; do
+	command -v "$tool" >/dev/null || { echo "Missing prerequisite: $tool" >&2; exit 1; }
+done
+
+# Fixed pins are deliberately independent of the editable package manifest.
+(
+	cd -- "$here"
+	sha256sum --check SHA256SUMS
+	sha256sum --check <<EOF
+5338f4f69b16503f45b2a147ac1bca360f735aa9fef28d1a5aba00718bd28100  $archive
+66338c218edbca7a85679bdf2092184e2c727f97bdf5191b839dbb22997a2085  patches/opensbi-etsoc1-plic-keep-priorities.patch
+135b19bfaa35bf8dc5ac95a0c059b5ce0caaccb2d66e0ce082524a7dc2a46482  patches/opensbi-etsoc1-mtval-sign-extension.patch
+EOF
+)
+python3 - "$here/$archive" "$pin" <<'PY'
+import sys
+import tarfile
+with tarfile.open(sys.argv[1], "r:gz") as source:
+    if source.pax_headers.get("comment") != sys.argv[2]:
+        raise SystemExit("Source archive does not carry the pinned git commit")
+    prefix = "opensbi-" + sys.argv[2]
+    for member in source:
+        parts = member.name.rstrip("/").split("/")
+        if parts[0] != prefix or ".." in parts or member.issym() or member.islnk():
+            raise SystemExit("Unexpected source archive path: " + member.name)
+print("Pinned source archive and package inputs verified")
+PY
+[[ $mode == verify ]] && exit 0
+[[ $jobs =~ ^[1-9][0-9]*$ ]] || { echo "JOBS must be a positive integer" >&2; exit 2; }
+for tool in make patch tar gzip env mktemp \
+	"${cross}gcc" "${cross}ld" "${cross}ar" "${cross}objcopy" "${cross}readelf"; do
+	command -v "$tool" >/dev/null || { echo "Missing prerequisite: $tool" >&2; exit 1; }
+done
+if [[ -n $out ]]; then
+	# Refuse any existing destination, including symlinks: no stale object reuse.
+	mkdir -- "$out"
+else
+	mkdir -p -- "$here/build"
+	out=$(mktemp -d "$here/build/run-XXXXXXXX")
+fi
+out=$(CDPATH= cd -- "$out" && pwd -P)
+# Upstream Makefiles do not support whitespace or Make metacharacters in paths.
+case "$out:$here:$cross" in
+	*[[:space:]]*|*[\#\$\%]*)
+		echo "Use paths/tool prefixes without whitespace, #, dollar or percent" >&2; exit 2 ;;
+esac
+tar -xzf "$here/$archive" -C "$out"
+src="$out/opensbi-$pin"
+for name in plic-keep-priorities mtval-sign-extension; do
+	patch --batch --forward --fuzz=0 -d "$src" -p1 \
+		< "$here/patches/opensbi-etsoc1-$name.patch"
+done
+args=(
+	-C "$src" O="$out/objects" PLATFORM=generic CROSS_COMPILE="$cross"
+	PLATFORM_RISCV_XLEN=64 PLATFORM_RISCV_ISA=rv64imac_zicsr_zifencei
+	PLATFORM_RISCV_ABI=lp64 FW_TEXT_START=0x8004200000
+	FW_DYNAMIC=n FW_JUMP=y FW_PAYLOAD=n
+	FW_JUMP_ADDR=0x8600200000 FW_JUMP_FDT_OFFSET=0x2200000
+	BUILD_INFO=n OPENSBI_VERSION_GIT= "-j$jobs"
+)
+{
+	printf 'Source commit: %s\n' "$pin"
+	printf 'Build command: '; printf '%q ' make "${args[@]}"; printf '\n'
+	printf 'Environment: LC_ALL=C TZ=UTC SOURCE_DATE_EPOCH=1790598985; other make environment cleared\n'
+	for tool in make python3 "${cross}gcc" "${cross}ld" "${cross}ar" "${cross}objcopy"; do
+		printf '\nTool: %s (%s)\n' "$tool" "$(command -v "$tool")"
+		"$tool" --version
+	done
+	printf '\nInput manifest:\n'
+	cat "$here/SHA256SUMS"
+} > "$out/build-receipt.txt"
+# Do not inherit MAKEFLAGS, CFLAGS, FW_FDT_PATH, platform overrides, etc.
+# Pin an empty version suffix so a surrounding 9front git tree cannot leak in.
+# No shell pipeline: a failed make is never hidden by tee/tail.
+if ! env -i PATH="$PATH" HOME="${HOME:-/}" LC_ALL=C TZ=UTC \
+	SOURCE_DATE_EPOCH=1790598985 make "${args[@]}" > "$out/build.log" 2>&1; then
+	tail -n 40 "$out/build.log" >&2
+	echo "Build failed; retained log: $out/build.log" >&2
+	exit 1
+fi
+cp "$out/objects/platform/generic/firmware/fw_jump.bin" "$out/fw_jump.bin"
+cp "$out/objects/platform/generic/firmware/fw_jump.elf" "$out/fw_jump.elf"
+"${cross}readelf" -h -l "$out/fw_jump.elf" > "$out/fw_jump.readelf.txt"
+(
+	cd -- "$out"
+	sha256sum fw_jump.bin fw_jump.elf > OUTPUT-SHA256SUMS
+)
+cat "$out/OUTPUT-SHA256SUMS"
+echo "Built firmware (not deployed): $out/fw_jump.bin"
+echo "Canonical historical binary is separate: et/artifacts/maxion/fw_jump.bin"

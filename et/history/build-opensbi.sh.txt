@@ -1,0 +1,84 @@
+#!/bin/bash
+# Build OpenSBI fw_payload (hello) and fw_jump (Linux) for the ET-SoC-1 Maxion.
+#
+#   ./build-opensbi.sh [opensbi-src-dir] [out-dir]
+#
+# Needs: a RISC-V cross compiler whose linker can create PIEs -- OpenSBI
+# insists on it.  The /opt/et bare-metal toolchain (riscv64-unknown-elf, built
+# by the et-platform instructions) does NOT ("-pie not supported"); Ubuntu's
+# gcc-riscv64-linux-gnu package works fine (CROSS_COMPILE=riscv64-linux-gnu-,
+# the default here).  Also: dtc, python3 + pyelftools (for et-mkimage).
+#
+# Memory map used (see etsoc1-maxion.dts, doc/MaxionBringup.md):
+#   FW_TEXT_START   0x80_0420_0000  OpenSBI (2 MiB aligned, inside the 4 MiB SP DM
+#                                   scratch region 0x80_0400_1000.., host BAR0 +0x1FF000)
+#   +0x80000        payload (hello S-mode test)
+#   +0x100000       FDT copied here by fw_payload
+#   FW_JUMP_ADDR    0x86_0020_0000  Linux Image, staged separately
+# fw_jump has no embedded FDT; the host supplies it via the boot stub's a1.
+# The pinned generic platform's FW_JUMP_FDT_OFFSET=0x2200000 relocates that
+# FDT to 0x8006400000 before Linux (also host-managed RAM; exclusive use only).
+set -euo pipefail
+OPENSBI=${1:-${OPENSBI_SRC:-/tmp/opensbi}}
+OUT=${2:-$(pwd)/out}
+HERE=$(cd "$(dirname "$0")" && pwd)
+CROSS=${CROSS_COMPILE:-riscv64-linux-gnu-}
+FW_TEXT_START=${FW_TEXT_START:-0x8004200000}
+FW_JUMP_ADDR=${FW_JUMP_ADDR:-0x8600200000}
+mkdir -p "$OUT"
+OPENSBI=$(realpath "$OPENSBI")
+OUT=$(realpath "$OUT")
+
+# 0. Required patches. Check complete hunks, not a marker that could also be
+# present in a partial/older patch.
+for name in plic-keep-priorities mtval-sign-extension; do
+    patchfile="$HERE/opensbi-etsoc1-$name.patch"
+    if git -C "$OPENSBI" apply --check "$patchfile" 2>/dev/null; then
+        git -C "$OPENSBI" apply "$patchfile"
+    elif ! git -C "$OPENSBI" apply --reverse --check "$patchfile" 2>/dev/null; then
+        echo "Cannot apply or confirm $patchfile; use the documented OpenSBI revision." >&2
+        exit 1
+    fi
+done
+
+# 1. device tree (cpp for #include, like the kernel does)
+cpp -nostdinc -I"$HERE" -undef -x assembler-with-cpp -P "$HERE/etsoc1-maxion.dts" | dtc -I dts -O dtb -o "$OUT/etsoc1-maxion.dtb" -
+
+# 2. hello payload (S-mode, position independent)
+${CROSS}gcc -march=rv64imac_zicsr_zifencei -mabi=lp64 -nostdlib -nostartfiles -static -fno-pie -no-pie \
+    -Wl,-Ttext=0 -Wl,--no-relax -Wl,--build-id=none -o "$OUT/payload_hello.elf" "$HERE/payload_hello.S"
+${CROSS}objdump -d "$OUT/payload_hello.elf" > "$OUT/payload_hello.dis"
+if grep -q "GLOBAL_OFFSET" "$OUT/payload_hello.dis"; then
+    echo "payload uses the GOT -> would read link-time addresses at run time"
+    exit 1
+fi
+${CROSS}objcopy -O binary "$OUT/payload_hello.elf" "$OUT/payload_hello.bin"
+
+# 3. OpenSBI fw_payload with embedded FDT and payload
+make -C "$OPENSBI" O="$OUT/opensbi" PLATFORM=generic CROSS_COMPILE="$CROSS" \
+    PLATFORM_RISCV_XLEN=64 PLATFORM_RISCV_ISA=rv64imac_zicsr_zifencei PLATFORM_RISCV_ABI=lp64 \
+    FW_TEXT_START=$FW_TEXT_START \
+    FW_DYNAMIC=n FW_JUMP=n FW_PAYLOAD=y \
+    FW_PAYLOAD_OFFSET=0x80000 FW_PAYLOAD_PATH="$OUT/payload_hello.bin" \
+    FW_FDT_PATH="$OUT/etsoc1-maxion.dtb" FW_PAYLOAD_FDT_OFFSET=0x100000 \
+    -j"$(nproc)"
+
+cp "$OUT/opensbi/platform/generic/firmware/fw_payload.bin" "$OUT/"
+cp "$OUT/opensbi/platform/generic/firmware/fw_payload.elf" "$OUT/"
+
+# 4. OpenSBI fw_jump for Linux: no embedded FDT (the boot stub passes the DTB the host
+#    staged in a1, OpenSBI configures itself from it and relocates it), jumps to the kernel
+#    at FW_JUMP_ADDR (= memory node base + 2 MiB in ../linux/etsoc1-maxion-linux.dts).
+make -C "$OPENSBI" O="$OUT/opensbi-jump" PLATFORM=generic CROSS_COMPILE="$CROSS" \
+    PLATFORM_RISCV_XLEN=64 PLATFORM_RISCV_ISA=rv64imac_zicsr_zifencei PLATFORM_RISCV_ABI=lp64 \
+    FW_TEXT_START=$FW_TEXT_START \
+    FW_DYNAMIC=n FW_JUMP=y FW_PAYLOAD=n \
+    FW_JUMP_ADDR=$FW_JUMP_ADDR \
+    -j"$(nproc)" > "$OUT/opensbi-jump.log" 2>&1 || { tail -20 "$OUT/opensbi-jump.log"; exit 1; }
+cp "$OUT/opensbi-jump/platform/generic/firmware/fw_jump.bin" "$OUT/"
+cp "$OUT/opensbi-jump/platform/generic/firmware/fw_jump.elf" "$OUT/"
+
+ls -la "$OUT/fw_payload.bin" "$OUT/fw_payload.elf" "$OUT/fw_jump.bin"
+echo "fw_payload.bin: load at $FW_TEXT_START, entry $FW_TEXT_START (hello payload, embedded DTB)"
+echo "fw_jump.bin:    load at $FW_TEXT_START, entry $FW_TEXT_START, a1 = DTB, jumps to $FW_JUMP_ADDR (Linux Image)"
+echo "EEFH (MAXION_BL1 flash region) image: et-dev/bin/et-mkimage maxion $OUT/fw_payload.elf $OUT/maxion_bl1.img"

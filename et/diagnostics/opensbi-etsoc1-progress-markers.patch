@@ -1,0 +1,376 @@
+# OpenSBI bring-up aid for the ET-SoC-1 Maxion: progress markers + last probed CSR in the Maxion->SP mailbox
+# (0x300000F0 / 0x300000F4), _start_hang records mcause/mepc/mtval at +0xF8/+0x100/+0x108. Optional.
+# Against OpenSBI 6ad246a (v1.9+). Apply with: git -C <opensbi> apply opensbi-etsoc1-progress-markers.patch
+#
+diff --git a/firmware/fw_base.S b/firmware/fw_base.S
+index a76ddc1..9cf36a3 100644
+--- a/firmware/fw_base.S
++++ b/firmware/fw_base.S
+@@ -40,6 +40,14 @@
+ 	add	\__d4, \__s4, zero
+ .endm
+ 
++
++/* ET-SoC-1 Maxion bring-up: progress markers in the Maxion->SP mailbox */
++.macro MX_MARK val
++	li	t6, 0x300000F0
++	li	t5, \val
++	sw	t5, 0(t6)
++.endm
++
+ .macro CLEAR_MDT tmp
+ #if __riscv_xlen == 32
+ 	li 	\tmp, MSTATUSH_MDT
+@@ -140,6 +148,7 @@ _skip_override_a1:
+ 	REG_L	a2, (t2)
+ _skip_override_a2:
+ 
++	MX_MARK 0x01
+ 	/* Find preferred boot HART id */
+ 	MOV_3R	s0, a0, s1, a1, s2, a2
+ 	call	fw_boot_hart
+@@ -166,6 +175,7 @@ _sc_fail:
+ #error "need a or zalrsc"
+ #endif
+ 
++	MX_MARK 0x02
+ 	/* relocate the global table content */
+ 	li	t0, FW_TEXT_START	/* link start */
+ 	lla	t1, _fw_start		/* load start */
+@@ -188,6 +198,7 @@ _sc_fail:
+ 	blt	t0, t1, 2b
+ _relocate_done:
+ 	/* At this point we are running from load address */
++	MX_MARK 0x03
+ 
+ 	/* Reset all registers except ra, a0, a1, a2, a3 and a4 for boot HART */
+ 	li	ra, 0
+@@ -201,6 +212,7 @@ _bss_zero:
+ 	add	s4, s4, __SIZEOF_POINTER__
+ 	blt	s4, s5, _bss_zero
+ 
++	MX_MARK 0x04
+ 	/* Setup temporary trap handler */
+ 	lla	s4, _start_hang
+ 	csrw	CSR_MTVEC, s4
+@@ -238,6 +250,7 @@ _bss_zero:
+ 	add	t0, a0, zero
+ 	MOV_5R	a0, s0, a1, s1, a2, s2, a3, s3, a4, s4
+ 	add	a1, t0, zero
++	MX_MARK 0x05
+ 
+ 	/* Preload HART details
+ 	 * s7 -> HART Count
+@@ -389,6 +402,7 @@ _fdt_reloc_again:
+ 	add	t1, t1, __SIZEOF_POINTER__
+ 	blt	t1, t2, _fdt_reloc_again
+ _fdt_reloc_done:
++	MX_MARK 0x06
+ 
+ 	/* mark boot hart done */
+ 	li	t0, BOOT_STATUS_BOOT_HART_DONE
+@@ -412,6 +426,7 @@ _start_warm:
+ 	/* Reset all registers except ra, a0, a1, a2, a3 and a4 for non-boot HART */
+ 	li	ra, 0
+ 	call	_reset_regs
++	MX_MARK 0x07
+ 
+ 	/* Disable all interrupts */
+ 	csrw	CSR_MIE, zero
+@@ -476,6 +491,7 @@ _skip_trap_handler_hyp:
+ 
+ 	/* Initialize SBI runtime */
+ 	csrr	a0, CSR_MSCRATCH
++	MX_MARK 0x08
+ 	call	sbi_init
+ 
+ 	/* We don't expect to reach here hence just hang */
+@@ -519,6 +535,15 @@ _hartid_to_scratch:
+ 	.align 3
+ 	.globl _start_hang
+ _start_hang:
++	li	t6, 0x300000F0
++	li	t5, 0xEE
++	sw	t5, 0(t6)
++	csrr	t5, CSR_MCAUSE
++	sw	t5, 8(t6)
++	csrr	t5, CSR_MEPC
++	sd	t5, 16(t6)
++	csrr	t5, CSR_MTVAL
++	sd	t5, 24(t6)
+ 	wfi
+ 	j	_start_hang
+ 
+diff --git a/include/sbi/sbi_csr_detect.h b/include/sbi/sbi_csr_detect.h
+index 097c31c..14f0d36 100644
+--- a/include/sbi/sbi_csr_detect.h
++++ b/include/sbi/sbi_csr_detect.h
+@@ -21,6 +21,7 @@
+ 	register ulong mtvec = (ulong)sbi_hart_expected_trap;		\
+ 	register ulong ret = 0;						\
+ 	((struct sbi_trap_info *)(trap))->cause = 0;			\
++	*(volatile unsigned int *)0x300000F4UL = 0x10000 | (csr_num); /* ET bring-up: last CSR probed (read) */ \
+ 	asm volatile(							\
+ 		"add %[ttmp], %[tinfo], zero\n"				\
+ 		"csrrw %[mtvec], " STR(CSR_MTVEC) ", %[mtvec]\n"	\
+@@ -39,6 +40,7 @@
+ 	register ulong ttmp asm("a4");					\
+ 	register ulong mtvec = (ulong)sbi_hart_expected_trap;		\
+ 	((struct sbi_trap_info *)(trap))->cause = 0;			\
++	*(volatile unsigned int *)0x300000F4UL = 0x20000 | (csr_num); /* ET bring-up: last CSR probed (write) */ \
+ 	asm volatile(							\
+ 		"add %[ttmp], %[tinfo], zero\n"				\
+ 		"csrrw %[mtvec], " STR(CSR_MTVEC) ", %[mtvec]\n"	\
+diff --git a/lib/sbi/sbi_hart.c b/lib/sbi/sbi_hart.c
+index bee8855..1b8a228 100644
+--- a/lib/sbi/sbi_hart.c
++++ b/lib/sbi/sbi_hart.c
+@@ -8,6 +8,9 @@
+  */
+ 
+ #include <sbi/riscv_asm.h>
++
++/* ET-SoC-1 Maxion bring-up: progress markers in the Maxion->SP mailbox */
++static inline void mx_mark(unsigned int v) { *(volatile unsigned int *)0x300000F0UL = v; }
+ #include <sbi/riscv_barrier.h>
+ #include <sbi/riscv_encoding.h>
+ #include <sbi/riscv_fp.h>
+@@ -483,9 +486,11 @@ static int hart_detect_features(struct sbi_scratch *scratch, bool cold_boot)
+ 	 * Needed to detect Smrnmi and install NMI handlers before CSR probes
+ 	 * that may trigger traps.
+ 	 */
++	mx_mark(0x50);
+ 	rc = sbi_platform_extensions_init(sbi_platform_ptr(scratch), cold_boot);
+ 	if (rc)
+ 		return rc;
++	mx_mark(0x51);
+ 
+ 	if (sbi_hart_has_extension(scratch, SBI_HART_EXT_SMRNMI)) {
+ 		const struct sbi_platform *plat = sbi_platform_thishart_ptr();
+@@ -571,7 +576,9 @@ static int hart_detect_features(struct sbi_scratch *scratch, bool cold_boot)
+ 	 * Detect the allowed address bits & granularity. At least PMPADDR0
+ 	 * should be implemented.
+ 	 */
++	mx_mark(0x52);
+ 	val = hart_pmp_get_allowed_addr();
++	mx_mark(0x53);
+ 	if (val) {
+ 		hfeatures->pmp_log2gran = sbi_ffs(val) + 2;
+ 		hfeatures->pmp_addr_bits = sbi_fls(val) + 1;
+@@ -579,9 +586,12 @@ static int hart_detect_features(struct sbi_scratch *scratch, bool cold_boot)
+ 		__check_csr_64(CSR_PMPADDR0, 0, val, pmp_count, __pmp_skip);
+ 	}
+ __pmp_skip:
++	mx_mark(0x54);
+ 	/* Detect number of MHPM counters */
+ 	__check_hpm_csr(CSR_MHPMCOUNTER3, mhpm_mask);
++	mx_mark(0x55);
+ 	hfeatures->mhpm_bits = hart_mhpm_get_allowed_bits();
++	mx_mark(0x56);
+ 	__check_hpm_csr_4(CSR_MHPMCOUNTER4, mhpm_mask);
+ 	__check_hpm_csr_8(CSR_MHPMCOUNTER8, mhpm_mask);
+ 	__check_hpm_csr_16(CSR_MHPMCOUNTER16, mhpm_mask);
+@@ -605,6 +615,7 @@ __pmp_skip:
+ 		hfeatures->priv_version = __priv;			\
+ 	}
+ 
++	mx_mark(0x57);
+ 	/* Detect if hart supports Priv v1.10 */
+ 	__check_priv(CSR_MCOUNTEREN,
+ 		     SBI_HART_PRIV_VER_UNKNOWN, SBI_HART_PRIV_VER_1_10);
+@@ -626,12 +637,14 @@ __pmp_skip:
+ 	}
+ 
+ 	/* Counter overflow/filtering is not useful without mcounter/inhibit */
++	mx_mark(0x58);
+ 	/* Detect if hart supports sscofpmf */
+ 	__check_ext_csr(SBI_HART_PRIV_VER_1_11,
+ 			CSR_SCOUNTOVF, SBI_HART_EXT_SSCOFPMF);
+ 	/* Detect if hart has AIA local interrupt CSRs */
+ 	__check_ext_csr(SBI_HART_PRIV_VER_UNKNOWN,
+ 			CSR_MTOPI, SBI_HART_EXT_SMAIA);
++	mx_mark(0x59);
+ 	/* Detect if hart supports stimecmp CSR(Sstc extension) */
+ 	__check_ext_csr(SBI_HART_PRIV_VER_1_12,
+ 			CSR_STIMECMP, SBI_HART_EXT_SSTC);
+@@ -641,9 +654,11 @@ __pmp_skip:
+ 	/* Detect if hart supports sstateen CSRs */
+ 	__check_ext_csr(SBI_HART_PRIV_VER_1_12,
+ 			CSR_SSTATEEN0, SBI_HART_EXT_SSSTATEEN);
++	mx_mark(0x5A);
+ 	/* Detect if hart supports smcntrpmf */
+ 	__check_ext_csr(SBI_HART_PRIV_VER_1_12,
+ 			CSR_MCYCLECFG, SBI_HART_EXT_SMCNTRPMF);
++	mx_mark(0x5B);
+ 	/* Detect if hart support sdtrig (debug triggers) */
+ 	__check_ext_csr(SBI_HART_PRIV_VER_UNKNOWN,
+ 			CSR_TSELECT, SBI_HART_EXT_SDTRIG);
+@@ -673,6 +688,7 @@ __pmp_skip:
+ 					SBI_HART_EXT_ZIHPM, true);
+ 
+ 	/* Mark hart feature detection done */
++	mx_mark(0x5F);
+ 	hfeatures->detected = true;
+ 
+ 	/*
+@@ -721,9 +737,11 @@ int sbi_hart_init(struct sbi_scratch *scratch, bool cold_boot)
+ 			return SBI_ENOMEM;
+ 	}
+ 
++	mx_mark(0x40);
+ 	rc = hart_detect_features(scratch, cold_boot);
+ 	if (rc)
+ 		return rc;
++	mx_mark(0x41);
+ 
+ 	if (cold_boot) {
+ 		rc = sbi_hart_pmp_init(scratch);
+@@ -731,6 +749,7 @@ int sbi_hart_init(struct sbi_scratch *scratch, bool cold_boot)
+ 			return rc;
+ 	}
+ 
++	mx_mark(0x42);
+ 	return sbi_hart_reinit(scratch);
+ }
+ 
+diff --git a/lib/sbi/sbi_init.c b/lib/sbi/sbi_init.c
+index acd2f8b..cc4efd9 100644
+--- a/lib/sbi/sbi_init.c
++++ b/lib/sbi/sbi_init.c
+@@ -11,6 +11,9 @@
+ #include <sbi/riscv_atomic.h>
+ #include <sbi/riscv_barrier.h>
+ #include <sbi/sbi_console.h>
++
++/* ET-SoC-1 Maxion bring-up: progress markers in the Maxion->SP mailbox */
++static inline void mx_mark(unsigned int v) { *(volatile unsigned int *)0x300000F0UL = v; }
+ #include <sbi/sbi_cppc.h>
+ #include <sbi/sbi_domain.h>
+ #include <sbi/sbi_double_trap.h>
+@@ -228,17 +231,17 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
+ 	const struct sbi_platform *plat = sbi_platform_ptr(scratch);
+ 
+ 	/* Note: This has to be first thing in coldboot init sequence */
+-	rc = sbi_scratch_init(scratch);
++	mx_mark(0x10); rc = sbi_scratch_init(scratch);
+ 	if (rc)
+ 		sbi_hart_hang();
+ 
+ 	/* Note: This has to be second thing in coldboot init sequence */
+-	rc = sbi_heap_init(scratch);
++	mx_mark(0x11); rc = sbi_heap_init(scratch);
+ 	if (rc)
+ 		sbi_hart_hang();
+ 
+ 	/* Note: This has to be the third thing in coldboot init sequence */
+-	rc = sbi_domain_init(scratch, hartid);
++	mx_mark(0x12); rc = sbi_domain_init(scratch, hartid);
+ 	if (rc)
+ 		sbi_hart_hang();
+ 
+@@ -253,7 +256,7 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
+ 	count = sbi_scratch_offset_ptr(scratch, entry_count_offset);
+ 	(*count)++;
+ 
+-	rc = sbi_hsm_init(scratch, true);
++	mx_mark(0x13); rc = sbi_hsm_init(scratch, true);
+ 	if (rc)
+ 		sbi_hart_hang();
+ 
+@@ -265,7 +268,7 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
+ 	 */
+ 	wake_coldboot_harts(scratch);
+ 
+-	rc = sbi_hart_init(scratch, true);
++	mx_mark(0x14); rc = sbi_hart_init(scratch, true);
+ 	if (rc)
+ 		sbi_hart_hang();
+ 
+@@ -307,47 +310,47 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
+ 			__stack_chk_guard = guard_val;
+ 	}
+ 
+-	rc = sbi_trap_init(scratch, true);
++	mx_mark(0x15); rc = sbi_trap_init(scratch, true);
+ 	if (rc)
+ 		sbi_hart_hang();
+ 
+-	rc = sbi_timer_init(scratch, true);
++	mx_mark(0x16); rc = sbi_timer_init(scratch, true);
+ 	if (rc)
+ 		sbi_hart_hang();
+ 
+-	rc = sbi_platform_early_init(plat, true);
++	mx_mark(0x17); rc = sbi_platform_early_init(plat, true);
+ 	if (rc)
+ 		sbi_hart_hang();
+ 
+-	rc = sbi_pmu_init(scratch, true);
++	mx_mark(0x18); rc = sbi_pmu_init(scratch, true);
+ 	if (rc) {
+ 		sbi_printf("%s: pmu init failed (error %d)\n",
+ 			   __func__, rc);
+ 		sbi_hart_hang();
+ 	}
+ 
+-	rc = sbi_dbtr_init(scratch, true);
++	mx_mark(0x19); rc = sbi_dbtr_init(scratch, true);
+ 	if (rc)
+ 		sbi_hart_hang();
+ 
+-	sbi_boot_print_banner(scratch);
++	mx_mark(0x1A); sbi_boot_print_banner(scratch);
+ 
+ 	sbi_double_trap_init(scratch);
+ 
+-	rc = sbi_irqchip_init(scratch, true);
++	mx_mark(0x1B); rc = sbi_irqchip_init(scratch, true);
+ 	if (rc) {
+ 		sbi_printf("%s: irqchip init failed (error %d)\n",
+ 			   __func__, rc);
+ 		sbi_hart_hang();
+ 	}
+ 
+-	rc = sbi_ipi_init(scratch, true);
++	mx_mark(0x1C); rc = sbi_ipi_init(scratch, true);
+ 	if (rc) {
+ 		sbi_printf("%s: ipi init failed (error %d)\n", __func__, rc);
+ 		sbi_hart_hang();
+ 	}
+ 
+-	rc = sbi_tlb_init(scratch, true);
++	mx_mark(0x1D); rc = sbi_tlb_init(scratch, true);
+ 	if (rc) {
+ 		sbi_printf("%s: tlb init failed (error %d)\n", __func__, rc);
+ 		sbi_hart_hang();
+diff --git a/lib/utils/serial/uart8250.c b/lib/utils/serial/uart8250.c
+index d65f127..6bcdc53 100644
+--- a/lib/utils/serial/uart8250.c
++++ b/lib/utils/serial/uart8250.c
+@@ -13,6 +13,10 @@
+ #include <sbi/sbi_domain.h>
+ #include <sbi_utils/serial/uart8250.h>
+ 
++/* ET-SoC-1 Maxion bring-up: progress markers in the Maxion->SP mailbox */
++static inline void mx_mark(unsigned int v) { *(volatile unsigned int *)0x300000F0UL = v; }
++
++
+ /* clang-format off */
+ 
+ #define UART_RBR_OFFSET		0	/* In:  Receive Buffer Register */
+@@ -121,6 +125,7 @@ void uart8250_device_init(struct uart8250_device *dev, unsigned long base,
+ 		       (16 * dev->baudrate);
+ 	}
+ 
++	mx_mark(0x30);
+ 	/* Disable all interrupts */
+ 	set_reg(dev, UART_IER_OFFSET, (caps & UART_CAP_UUE) ?
+ 				 UART_IER_UUE : 0x00);
+@@ -145,6 +150,7 @@ void uart8250_device_init(struct uart8250_device *dev, unsigned long base,
+ 		get_reg(dev, UART_RBR_OFFSET);
+ 	/* Set scratchpad */
+ 	set_reg(dev, UART_SCR_OFFSET, 0x00);
++	mx_mark(0x31);
+ }
+ 
+ int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift,
