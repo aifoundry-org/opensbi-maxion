@@ -32,9 +32,42 @@ environment, missing prerequisites, informational package-inventory failures,
 and failed-build/mismatched-binary output retention. These are not hardware
 tests and do not replace actual compilation.
 
-Clean-clone reproduction records are retained under `et/validation/` when
-completed. Historical tests from the earlier archive recipe are separately
-labeled under `et/history/` and are not presented as this fork's new test runs.
+## Independent clean-clone reproduction — PASS
+
+A separate reviewer made an actual `git clone --no-local --single-branch -b et`
+of commit `6a53a4f77687e5f0d33e4768eb17f43bcf0fa5d1` at a different path.
+The clone had no alternates, retained the upstream history, and stayed clean.
+All section 3 commands from `et/README.md` were executed, including:
+
+- All 31 shipped support-file checksum entries verified.
+- Source, independent reference and strict toolchain preflight passed.
+- All 18 unit tests passed.
+- A fresh two-job build passed; external `cmp` and `sha256sum` confirmed the
+  exact canonical raw firmware.
+- A second fresh one-job build with deliberately invalid inherited
+  `MAKEFLAGS`, `CFLAGS`, `FW_TEXT_START`, `FW_FDT_PATH` and `GCC_EXEC_PREFIX`
+  also produced exactly the same raw firmware.
+- Both outputs matched the frozen reference and each other byte-for-byte:
+  **279,048 bytes, SHA-256
+  `97252e0c8dbd66b38950d14a89f3bfdedd994727ee22dc1f2652144cde23ba18`.**
+
+Each log shows 202 compilation, six assembly and two archive stages, plus ELF
+linking and binary extraction. Each used a separate source archive and empty
+object tree; no prebuilt output or reference was substituted for compilation.
+Output and log hashes in both receipts were independently rechecked.
+
+Full command/exit records, receipts, resolved configurations, logs and the
+reviewer's original report are retained in `et/validation/clean-clone/`.
+That report retains its original ignored-directory locations from the time
+of testing; the evidence was subsequently copied unchanged here.
+
+This was a real relocated **local-transport** Git clone, not a claim that
+GitHub write authentication or publication succeeded. The exact tool packages
+were preinstalled: apt provisioning, availability on future package mirrors,
+and a stripped-host minimum-package test were not exercised.
+
+Historical tests from the earlier archive recipe are separately labeled under
+`et/history/` and are not presented as this fork's new test runs.
 
 ## Reproducibility boundary
 

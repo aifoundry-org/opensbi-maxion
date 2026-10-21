@@ -1,0 +1,28 @@
+test_archive_traversal_links_and_special_files_rejected (test_build.BuildControls) ... ok
+test_binary_mismatch_retains_outputs_and_failed_receipt (test_build.BuildControls) ... Failed build retained: /tmp/maxion-tests-n79algh5/mismatch-output
+ok
+test_committed_source_change_rejected (test_build.BuildControls) ... ok
+test_dirty_tracked_source_unstaged_staged_and_deleted_rejected (test_build.BuildControls) ... ok
+test_environment_does_not_inherit_build_or_loader_overrides (test_build.BuildControls) ... ok
+test_independent_reference_and_byte_comparison (test_build.BuildControls) ... ok
+test_make_and_shell_metacharacters_and_spaces_rejected (test_build.BuildControls) ... ok
+test_make_failure_retains_log_and_failed_receipt (test_build.BuildControls) ... Failed build retained: /tmp/maxion-tests-v80msz3c/output
+ok
+test_missing_modified_truncated_and_symlink_reference_rejected (test_build.BuildControls) ... ok
+test_missing_prerequisite_is_actionable (test_build.BuildControls) ... ok
+test_output_refuses_existing_directory_file_and_dangling_symlink (test_build.BuildControls) ... ok
+test_package_inventory_execution_failure_is_informational (test_build.BuildControls) ... WARNING: Could not execute dpkg-query; package inventory omitted. Mandatory executable/version checks are unchanged.
+ok
+test_package_inventory_missing_dpkg_is_informational (test_build.BuildControls) ... WARNING: dpkg-query unavailable; package inventory omitted. Mandatory executable/version checks are unchanged.
+ok
+test_package_inventory_missing_packages_is_informational (test_build.BuildControls) ... WARNING: Package inventory incomplete or unavailable; see captured dpkg-query output. Mandatory executable/version checks are unchanged.
+ok
+test_source_tree_hash_matches_git_and_excludes_only_et (test_build.BuildControls) ... ok
+test_toolchain_binary_mismatch_fails (test_build.BuildControls) ... ok
+test_uncommitted_support_allowed_and_reported (test_build.BuildControls) ... ok
+test_unique_default_outputs (test_build.BuildControls) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.072s
+
+OK

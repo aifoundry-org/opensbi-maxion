@@ -1,0 +1,5 @@
+Auxiliary patch check initially compared default 8-digit git index abbreviations with archival 7-digit indices; corrected display-only comparison with git -c core.abbrev=7 (no source changes).
+c50ce7a2: committed diff byte-identical to archival opensbi-etsoc1-plic-keep-priorities.patch after leading archival comments removed and 7-digit index display selected
+ba6cec97: committed diff byte-identical to archival opensbi-etsoc1-mtval-sign-extension.patch after leading archival comments removed and 7-digit index display selected
+reproduce-1: all 4 recorded output hashes rechecked; actual object-tree binary identical to copied output and reference; poisoned keys absent; stages {'CC': 202, 'AS': 6, 'AR': 2, 'ELF': 1, 'OBJCOPY': 1}
+reproduce-2-poisoned: all 4 recorded output hashes rechecked; actual object-tree binary identical to copied output and reference; poisoned keys absent; stages {'CC': 202, 'AS': 6, 'AR': 2, 'ELF': 1, 'OBJCOPY': 1}
