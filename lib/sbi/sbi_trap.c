@@ -311,6 +311,23 @@ struct sbi_trap_context *sbi_trap_handler(struct sbi_trap_context *tcntx)
 	struct sbi_trap_regs *regs = &tcntx->regs;
 	ulong mcause = tcntx->trap.cause;
 
+	/*
+	 * Esperanto ET-Maxion (ET-SoC-1, mvendorid 0x5e5) erratum RTLMAX-617:
+	 * mtval is a 49-bit register that is not always sign-extended when
+	 * written with a fault address; a kernel address (bit 47 set) arrives
+	 * with bits 63:48 cleared.  The core has 48-bit virtual addresses, so
+	 * sign-extending from bit 47 recovers it.  Needed by the misaligned
+	 * load/store emulation (which accesses tval) and for the stval that
+	 * redirected traps hand to S-mode.  Instruction encodings and zero
+	 * (illegal instruction, ecall) are unaffected by the operation.
+	 */
+#if __riscv_xlen == 64
+	if (!(mcause & MCAUSE_IRQ_MASK) &&
+	    csr_read(CSR_MVENDORID) == 0x5e5 &&
+	    csr_read(CSR_MARCHID) == 0x8000000000000002UL)
+		tcntx->trap.tval = (long)(tcntx->trap.tval << 16) >> 16;
+#endif
+
 	/* Update trap context pointer */
 	tcntx->prev_context = sbi_trap_get_context(scratch);
 	sbi_trap_set_context(scratch, tcntx);
