@@ -32,6 +32,8 @@ struct plic_data {
 #define PLIC_FLAG_THEAD_DELEGATION	BIT(1)
 /** Allocate space for power management save/restore operations */
 #define PLIC_FLAG_ENABLE_PM		BIT(2)
+/** PLIC shared with other agents: do not reset the source priorities at cold init */
+#define PLIC_FLAG_KEEP_PRIORITY		BIT(3)
 
 #define PLIC_M_CONTEXT			0
 #define PLIC_S_CONTEXT			1

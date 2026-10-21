@@ -259,8 +259,9 @@ int plic_cold_irqchip_init(struct plic_data *plic)
 	}
 
 	/* Configure default priorities of all IRQs */
-	for (i = 1; i <= plic->num_src; i++)
-		plic_set_priority(plic, i, 0);
+	if (!(plic->flags & PLIC_FLAG_KEEP_PRIORITY))
+		for (i = 1; i <= plic->num_src; i++)
+			plic_set_priority(plic, i, 0);
 
 	plic_delegate(plic);
 
