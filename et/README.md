@@ -150,6 +150,7 @@ work as if it were an OpenSBI patch.
 ## Validation and operating boundary
 
 - [Validation records](VALIDATION.md)
+- [Linux/9front binary identity evidence](docs/LINUX-IDENTITY.md)
 - [Provenance and licenses](docs/PROVENANCE.md)
 - [Runtime contract and safety](docs/RUNTIME.md)
 
