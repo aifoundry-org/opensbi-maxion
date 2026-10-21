@@ -11,9 +11,11 @@ suffixes or prereleases). Ordinary branch pushes and upstream tags such as
 1. Check out the exact commit from the tag-push event, with complete history.
    The local tag must resolve to that commit. Verify `et/SHA256SUMS`.
 2. On the native `ubuntu-22.04` runner, explicitly install the recorded Ubuntu
-   GCC 11.4.0 cross-toolchain and binutils 2.38 packages. Executable hashes and
+   GCC 11.4.0 cross-toolchain, binutils 2.38 and mawk packages. Executable hashes and
    complete version strings must pass the existing preflight. Package removal
    from the Ubuntu mirrors is a failure, not permission to substitute tools.
+   The builder privately selects pinned mawk as `awk`, regardless of the
+   runner's default awk. See [the first-run diagnosis](CI-VALIDATION.md).
 3. Run offline tests, compile in a fresh directory, and require the historical
    raw firmware size, SHA-256 and full byte comparison. The first release
    remains the same firmware used for Linux and 9front.
@@ -41,6 +43,10 @@ Diagnostic workflow artifacts expire after 14 days. **The release assets are
 the consumer-facing files**, not those temporary workflow artifacts.
 Rerunning a workflow may replace its temporary workflow artifacts; it never
 replaces the separately published GitHub release assets.
+
+Failed-build diagnostics also retain candidate BIN/ELF files and generated
+driver arrays for comparison. A failed candidate is **not** a release asset
+or a newly accepted reference.
 
 ## Published assets
 

@@ -16,13 +16,16 @@ inventory-command failure produce a warning and are recorded, not a failed build
 The receipt retains its stdout, stderr and exit status when available.
 Executable hashes are the enforced cross-toolchain gate. Host tools, Python and
 make are fingerprinted/reported in each receipt; host binaries need not match
-the original machine. This is not a fully hermetic operating-system image:
+the original machine. The additional `codegen_tools.mawk` executable/version pin
+is mandatory: its associative-array iteration order determines upstream
+generated driver-array ordering and thus raw firmware bytes.
+This is not a fully hermetic operating-system image:
 shared libraries, kernel and Python standard library remain host dependencies.
 There is no tested container workflow and the builder never uses Docker.
 
 The script captures `HEAD` and its full tree, reconstructs the root Git tree hash
 with only `et/` removed, and demands
-`e1b04052bd6a5093d5abf9e1279f168974899f7d` (including the release workflow; firmware sources unchanged). Dirty tracked files outside `et/`
+`765649af8f071b5981e3c186d35ab6da709af47a` (including the release workflow; firmware sources unchanged). Dirty tracked files outside `et/`
 (staged or unstaged) fail. Untracked source-side files cannot enter the build:
 only a fresh `git archive` of the captured commit is extracted. No vendor tarball
 or patch reapplication is involved. The archive includes committed `et/` support
@@ -36,8 +39,11 @@ For a release reproduction, run from a clean committed checkout so the commit
 identifies all support files as well. The firmware source itself is never edited.
 
 Every build subprocess receives a new explicit environment, not an augmented
-copy of the caller's environment. PATH is `/usr/bin:/bin`; build HOME and TMPDIR
-are private. Locale, timezone, source epoch, ISA, ABI, firmware addresses, version
+copy of the caller's environment. The base PATH is `/usr/bin:/bin`; build PATH
+prepends a new private directory containing only `awk -> /usr/bin/mawk`.
+The selected mawk must pass its pin before building; system awk alternatives
+are never modified. Build HOME and TMPDIR are private.
+Locale, timezone, source epoch, ISA, ABI, firmware addresses, version
 suffix and build-info settings are fixed. Paths with whitespace or shell/Make
 metacharacters are rejected because the upstream Makefiles cannot handle them.
 

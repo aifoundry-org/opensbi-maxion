@@ -44,6 +44,7 @@ The validated native environment is **Ubuntu 22.04, x86-64 Linux**, using:
 | `gcc-riscv64-linux-gnu` selector package | `4:11.2.0--1ubuntu1` |
 | `binutils-riscv64-linux-gnu` | `2.38-4ubuntu2.12` |
 | GNU Make | 4.3 |
+| Code-generation awk | `mawk` package `1.3.4.20200120-3`, executable hash pinned |
 | Python | 3.10 or newer; validation used 3.10.12 |
 | Other host tools | Git and standard Linux utilities |
 
@@ -54,7 +55,8 @@ sudo apt-get update
 sudo apt-get install git make python3 \
   gcc-riscv64-linux-gnu=4:11.2.0--1ubuntu1 \
   gcc-11-riscv64-linux-gnu=11.4.0-1ubuntu1~22.04cross1 \
-  binutils-riscv64-linux-gnu=2.38-4ubuntu2.12
+  binutils-riscv64-linux-gnu=2.38-4ubuntu2.12 \
+  mawk=1.3.4.20200120-3
 ```
 
 These commands install host packages only. The build itself needs no root
@@ -72,6 +74,11 @@ Compiler binaries, host shared libraries and a Linux/container image are not
 bundled. This is a checked, pinned native recipe, not a claim that every GCC
 release, architecture or distribution generates identical code. No untested
 Docker recipe is presented as verified.
+
+The builder also pins `/usr/bin/mawk` and privately selects it as `awk` for
+code generation, without changing system alternatives. Upstream's generated
+driver-array order differs between mawk and GNU awk, changing the raw firmware
+even when GCC and binutils are identical. See [the CI diagnosis](docs/CI-VALIDATION.md).
 
 ## 3. Verify, build and compare
 

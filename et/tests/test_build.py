@@ -160,6 +160,38 @@ class BuildControls(unittest.TestCase):
         with self.assertRaisesRegex(builder.BuildError, "Missing prerequisite.*never installs"):
             builder.prerequisite("not-a-real-maxion-build-command-123")
 
+    def test_private_awk_selection_overrides_host_awk_without_mutating_it(self):
+        fake = self.root / "host-bin"
+        fake.mkdir()
+        host_awk = fake / "awk"
+        host_awk.write_text("#!/bin/sh\necho UNPINNED-AWK\n")
+        host_awk.chmod(0o755)
+        out = self.root / "build"
+        out.mkdir()
+        with patch.object(builder, "SAFE_PATH", str(fake) + ":/usr/bin:/bin"):
+            env = builder.build_environment(out)
+        self.assertEqual((out / "host-tools/awk").resolve(), Path(builder.MAWK).resolve())
+        result = builder.run(["awk", "-W", "version"], self.root, env)
+        self.assertIn(b"mawk 1.3.4", result)
+        self.assertNotIn(b"UNPINNED-AWK", result)
+        self.assertEqual(host_awk.read_text(), "#!/bin/sh\necho UNPINNED-AWK\n")
+        with self.assertRaises(FileExistsError):
+            builder.build_environment(out)
+
+    def test_codegen_mawk_pin_cannot_be_replaced(self):
+        pins = json.loads((SCRIPT.parent / "toolchain.json").read_text())
+        order = ["gcc", "ld", "ar", "objcopy", "readelf", "as",
+                 "gcc_selected_cc1", "gcc_selected_as", "gcc_selected_ld",
+                 "gcc_selected_collect2"]
+        self.assertEqual(set(pins["cross_tools"]), set(order))
+        records = [pins["cross_tools"][name] for name in order]
+        wrong = {**pins["codegen_tools"]["mawk"], "sha256": "0" * 64}
+        with patch.object(builder, "prerequisite", return_value="/fake/tool"), \
+                patch.object(builder, "run", return_value=b"/fake/tool\n"), \
+                patch.object(builder, "tool_record", side_effect=records + [wrong]):
+            with self.assertRaisesRegex(builder.BuildError, "mismatch for mawk"):
+                builder.verify_toolchain(SCRIPT.parent, builder.safe_environment())
+
     def test_toolchain_binary_mismatch_fails(self):
         pins = json.loads((SCRIPT.parent / "toolchain.json").read_text())
         expected = pins["cross_tools"]["gcc"]

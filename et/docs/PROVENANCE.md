@@ -11,14 +11,16 @@ The two production patches were imported unchanged from
 The original PLIC change was introduced in `f84a8b20`, and the trap-value/
 `fw_jump` work in `9e5d002c`. The corrected DT timebase followed in `57ba7a8a`.
 
-Standalone production commits are `c50ce7a2` and `ba6cec97`. Their original
+Standalone production commits are now `8736d4f9` and `b8681ccd`, formerly
+`c50ce7a2` and `ba6cec97` before the owner's requested
+[attribution correction](COMMIT-ATTRIBUTION.md). Their original
 source tree, **excluding only the new top-level `et/` directory**, is
 `f048c30f926905c34497da4665a14c2d2d5e564b`.
 No progress-marker instrumentation is applied to that tree.
 
 The release workflow adds only `.github/workflows/maxion-release.yml` outside
 `et/`, changing the current enforced non-`et/` tree to
-`e1b04052bd6a5093d5abf9e1279f168974899f7d`.
+`765649af8f071b5981e3c186d35ab6da709af47a`.
 No firmware source files change. Both identities are retained in
 `et/PROVENANCE.json`; historical receipts keep their original source trees.
 

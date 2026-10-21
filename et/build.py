@@ -15,15 +15,16 @@ import sys
 import tarfile
 import tempfile
 
-SOURCE_TREE = "e1b04052bd6a5093d5abf9e1279f168974899f7d"
+SOURCE_TREE = "765649af8f071b5981e3c186d35ab6da709af47a"
 UPSTREAM_COMMIT = "6ad246a1494807ee91e36ffcf60e4c30bb309d45"
 REFERENCE_SHA256 = "97252e0c8dbd66b38950d14a89f3bfdedd994727ee22dc1f2652144cde23ba18"
 REFERENCE_SIZE = 279048
 EPOCH = "1790598985"
 SAFE_PATH = "/usr/bin:/bin"
 CROSS = "/usr/bin/riscv64-linux-gnu-"
+MAWK = "/usr/bin/mawk"
 HOST_TOOLS = (
-    "make", "git", "python3", "sh", "bash", "awk", "sed", "grep",
+    "make", "git", "python3", "sh", "bash", "sed", "grep",
     "head", "readlink", "dirname", "basename", "mkdir", "rm", "cat",
     "uname", "tr", "od", "cp", "ln",
 )
@@ -203,6 +204,12 @@ def verify_toolchain(here, env):
                              "Use the pinned packages in et/toolchain.json.")
         if records[name]["version"] != expected["version"]:
             raise BuildError("Toolchain version mismatch for " + name)
+    # carray.sh iterates associative arrays. GNU awk and mawk produce different
+    # relocation ordering even with identical GCC/binutils and source inputs.
+    mawk = tool_record(prerequisite(MAWK), here, env, ("-W", "version"))
+    expected = pins["codegen_tools"]["mawk"]
+    if any(mawk[key] != expected[key] for key in ("sha256", "version")):
+        raise BuildError("Code-generation tool fingerprint/version mismatch for mawk")
     host = {}
     for name in HOST_TOOLS:
         path = prerequisite(name)
@@ -214,7 +221,19 @@ def verify_toolchain(here, env):
         host[name]["version"] = run([host[name]["path"], "--version"],
                                    here, env).decode(errors="replace")
     package_report = package_inventory(pins["packages"].keys(), here, env)
-    return {"cross_tools": records, "host_tools": host, "packages": package_report}
+    return {"cross_tools": records, "codegen_tools": {"mawk": mawk},
+            "host_tools": host, "packages": package_report}
+
+
+def build_environment(out):
+    """Select pinned awk privately; do not change host alternatives or source."""
+    tools = out / "host-tools"
+    tools.mkdir()
+    (tools / "awk").symlink_to(MAWK)
+    env = safe_environment(out / "home")
+    env["TMPDIR"] = str(out / "tmp")
+    env["PATH"] = str(tools) + ":" + SAFE_PATH
+    return env
 
 
 def new_output(here, requested):
@@ -350,8 +369,7 @@ def main(argv=None):
     out = new_output(here, args.out)
     (out / "home").mkdir()
     (out / "tmp").mkdir()
-    env = safe_environment(out / "home")
-    env["TMPDIR"] = str(out / "tmp")
+    env = build_environment(out)
     build(root, here, out, env, inputs, reference, args.jobs)
     return 0
 
@@ -361,4 +379,7 @@ if __name__ == "__main__":
         sys.exit(main())
     except (BuildError, OSError, ValueError, tarfile.TarError) as error:
         print("ERROR: " + str(error), file=sys.stderr)
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            message = str(error).replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+            print("::error title=OpenSBI build failed::" + message)
         sys.exit(1)

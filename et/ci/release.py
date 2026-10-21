@@ -124,6 +124,13 @@ def validated_build(root, build, tag):
     for name, pin in pins["cross_tools"].items():
         require(all(actual_tools[name].get(key) == pin[key] for key in ("sha256", "version")),
                 "Receipt pinned toolchain differs: " + name)
+    codegen_tools = inputs["toolchain"].get("codegen_tools", {})
+    require(isinstance(codegen_tools, dict)
+            and set(codegen_tools) == set(pins["codegen_tools"]),
+            "Receipt codegen_tools set differs")
+    for name, pin in pins["codegen_tools"].items():
+        require(all(codegen_tools[name].get(key) == pin[key] for key in ("sha256", "version")),
+                "Receipt pinned codegen tool differs: " + name)
     return source, support, files
 
 

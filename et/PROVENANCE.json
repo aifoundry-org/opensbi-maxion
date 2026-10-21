@@ -2,10 +2,10 @@
   "upstream_repository": "https://github.com/riscv-software-src/opensbi.git",
   "upstream_commit": "6ad246a1494807ee91e36ffcf60e4c30bb309d45",
   "upstream_tree": "55a808af978e000950dcb01e6cf0fc87b71a641f",
-  "production_source_tree_without_et": "e1b04052bd6a5093d5abf9e1279f168974899f7d",
+  "production_source_tree_without_et": "765649af8f071b5981e3c186d35ab6da709af47a",
   "required_patch_commits": [
-    "c50ce7a2",
-    "ba6cec97"
+    "8736d4f9d30e8fe94eec483635b34b3ab27b0afb",
+    "b8681ccdd3e67e5f35360898f398dd2add67c82f"
   ],
   "original_repository": "https://github.com/aifoundry-org/et-platform.git",
   "original_commit": "cb3f00b751df0041f57dcaf926f06d9a723a577d",
@@ -72,5 +72,10 @@
     }
   ],
   "patched_upstream_tree_before_release_workflow": "f048c30f926905c34497da4665a14c2d2d5e564b",
-  "source_tree_note": "The strict non-et tree adds only .github/workflows/maxion-release.yml to the original two-patch upstream tree; firmware source files are unchanged."
+  "source_tree_note": "The strict non-et tree adds only .github/workflows/maxion-release.yml to the original two-patch upstream tree; firmware source files are unchanged.",
+  "original_required_patch_commits": [
+    "c50ce7a2",
+    "ba6cec97"
+  ],
+  "attribution_rewrite": "et/docs/COMMIT-ATTRIBUTION.md"
 }

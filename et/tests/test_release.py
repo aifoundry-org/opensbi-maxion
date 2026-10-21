@@ -66,7 +66,8 @@ class ReleaseControls(unittest.TestCase):
                     name: release.sha((self.root / "et" / name).read_bytes())
                     for name in ("build.py", "toolchain.json")
                 },
-                "toolchain": {"cross_tools": pins["cross_tools"]},
+                "toolchain": {"cross_tools": pins["cross_tools"],
+                              "codegen_tools": pins["codegen_tools"]},
             },
             "comparison": {**release.reference_identity(), "byte_comparison": "identical"},
             "output_sha256": {
@@ -198,6 +199,29 @@ class ReleaseControls(unittest.TestCase):
         self.receipt["inputs"]["toolchain"]["cross_tools"]["gcc"]["sha256"] = "0" * 64
         self.save_receipt()
         self.rejected("pinned toolchain differs")
+
+    def test_codegen_tool_hash_and_version_tampering_rejected(self):
+        tools = self.receipt["inputs"]["toolchain"]["codegen_tools"]
+        original = copy.deepcopy(tools)
+        for key, value in (("sha256", "0" * 64), ("version", "GNU Awk substituted\n")):
+            with self.subTest(field=key):
+                tools["mawk"][key] = value
+                self.save_receipt()
+                self.rejected("pinned codegen tool differs: mawk")
+                tools["mawk"] = copy.deepcopy(original["mawk"])
+
+    def test_missing_and_unexpected_codegen_tools_rejected(self):
+        toolchain = self.receipt["inputs"]["toolchain"]
+        original = copy.deepcopy(toolchain["codegen_tools"])
+        del toolchain["codegen_tools"]
+        self.save_receipt()
+        self.rejected("codegen_tools set differs")
+        for tools in (None, {}, {"gawk": original["mawk"]},
+                      {**original, "unrecorded-awk": original["mawk"]}):
+            with self.subTest(tools=tools):
+                toolchain["codegen_tools"] = tools
+                self.save_receipt()
+                self.rejected("codegen_tools set differs")
 
     def test_strict_tags_and_tag_commit_mismatch(self):
         for tag in ("v1.0.0", "maxion-v01.0.0", "maxion-v1.00.0", "maxion-v1.0.01",
