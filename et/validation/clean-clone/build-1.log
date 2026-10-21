@@ -1,0 +1,3 @@
+BIT-IDENTICAL-PASS: 97252e0c8dbd66b38950d14a89f3bfdedd994727ee22dc1f2652144cde23ba18 (279048 bytes)
+Firmware (NOT deployed): /tmp/opensbi-maxion-readme-check/et/build/reproduce-1/fw_jump.bin
+Receipt: /tmp/opensbi-maxion-readme-check/et/build/reproduce-1/build-receipt.json

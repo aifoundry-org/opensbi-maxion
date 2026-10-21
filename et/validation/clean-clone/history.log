@@ -1,0 +1,4 @@
+6a53a4f7 et: preserve Maxion bring-up assets and enforce the historical bit-identical build
+ba6cec97 sbi: apply the ET-SOC1 Maxion trap-value sign-extension workaround
+c50ce7a2 irqchip: preserve shared PLIC priorities when requested by the Maxion DT
+6ad246a1 platform: generic: metanoia/mt2824: configure PMA for DSP memory regions

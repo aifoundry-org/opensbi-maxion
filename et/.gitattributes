@@ -1,7 +1,7 @@
 * -text
 reference/*.bin binary
-validation/*.log binary
-validation/* -whitespace
+validation/**/*.log binary
+validation/** -whitespace
 patches/*.patch -whitespace
 diagnostics/*.patch -whitespace
 legacy/* -whitespace
