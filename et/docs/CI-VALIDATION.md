@@ -53,6 +53,37 @@ The reference bytes, source patches and expected raw SHA-256 remain unchanged.
 The failed tag is retained as historical evidence. A corrected release uses a
 new tag rather than moving the failed tag or hiding its run.
 
-The diagnosis and local tests do not themselves establish that the repaired
-hosted run succeeds; its run conclusion and downloadable release bytes must
-be checked separately.
+## Corrected hosted release: PASS
+
+Tag **`maxion-v1.0.1`**, commit
+`19440df26710933841909f08d0c070a1bff810e3`, completed GitHub Actions run
+**`39672576351`** successfully. Both the build and publish jobs passed:
+package installation, pinned tool checks, all 45 tests, actual compilation,
+mandatory firmware comparison, packaging, cross-job verification, draft upload
+and publication.
+
+All **15 published release assets** were then downloaded independently.
+Their GitHub-reported digests and `SHA256SUMS` entries verified. The release
+package verifier bound the downloaded receipt, toolchain, provenance and
+licenses to the clean tagged checkout. The downloaded `fw_jump.bin` compared
+byte-for-byte equal to the historical reference:
+
+```text
+279048 bytes
+97252e0c8dbd66b38950d14a89f3bfdedd994727ee22dc1f2652144cde23ba18
+```
+
+This is measured hosted build **and publication** success, not just a local
+simulation. A separate local test also selected GNU awk as the simulated host
+default and confirmed the repaired builder's private mawk selection still
+produced the reference bytes.
+
+GitHub reported this published release as `draft: false`, `immutable: false`.
+Repository-level immutable releases were not enabled by this workflow.
+Administrators should enable that setting for future releases; consumers must
+still pin the expected binary hash independently.
+
+The attribution correction is documented separately in
+[COMMIT-ATTRIBUTION.md](COMMIT-ATTRIBUTION.md). The failed v1.0.0 tag and
+original receipts are preserved; upstream history and firmware source files
+remain unchanged.

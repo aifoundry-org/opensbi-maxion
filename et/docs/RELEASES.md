@@ -68,7 +68,7 @@ attestations.
 
 ## Maintainer procedure
 
-Before the first release, enable **immutable releases** in this repository's
+Enable **immutable releases** in this repository's
 GitHub settings and protect the `maxion-v*` tag namespace against unauthorized
 creation, movement and deletion. Those administrative settings are not changed
 by this source-controlled workflow. Do not move a release tag during a run.
@@ -81,11 +81,14 @@ git tag -a maxion-v1.0.0 <reviewed-full-commit> -m 'Maxion reference firmware 1.
 git push origin refs/tags/maxion-v1.0.0
 ```
 
-This is an example for a future intentional release, not a tag created by
-implementing this workflow. A first hosted run is still required to validate
-the runner's actual package provisioning and GitHub release publication.
-Local native compilation and mocked publication tests cannot prove those
-external services work.
+This is an example of the maintainer procedure, not a command to reuse an
+existing version. `maxion-v1.0.0` records the rejected first build;
+**`maxion-v1.0.1` is the successfully built and published reference release**.
+See [hosted validation](CI-VALIDATION.md), including independent verification
+of all downloaded assets. GitHub reported v1.0.1 as non-immutable; enabling
+the administrative setting protects future releases, not that past publication.
+Local native compilation and mocked publication tests alone cannot establish
+that a future runner, package mirror or GitHub publication succeeds.
 
 ## Linux and 9front consumption
 
