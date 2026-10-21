@@ -87,3 +87,31 @@ The attribution correction is documented separately in
 [COMMIT-ATTRIBUTION.md](COMMIT-ATTRIBUTION.md). The failed v1.0.0 tag and
 original receipts are preserved; upstream history and firmware source files
 remain unchanged.
+
+## Firmware plus DT profiles: v1.1.0 PASS
+
+Release `maxion-v1.1.0`, commit
+`b8383cc32041b7ef3bfc614d9dea132fed24d41c`, passed both build and publication
+jobs in GitHub Actions run **`39676936835`**. All 70 tests passed in the local
+fresh-clone acceptance run and the hosted test step passed. The release has
+**19 assets**, all independently downloaded and verified against GitHub
+digests, SHA256SUMS and the clean tagged checkout. The downloaded firmware
+still compares byte-for-byte equal to the historical reference.
+
+Before publication, a `--no-local` clone rebuilt the actual firmware and both
+DT profiles, packaged all assets, and passed checkout-bound verification.
+Its verified source archive was extracted into a separate directory with no
+Git repository or sibling inputs. A clean-environment standalone DT rebuild
+produced identical DTBs, receipt and source archive.
+
+- Linux base: `95391dbcebbd8c10eb46e6e8f3a331c884be97458c67a77e5c844380920b66e5`,
+  2917 bytes.
+- 9front profile: `2af95f991d3b8731b3a2a48f98d0b1ef17b40d4df40c2341784c0aef8216bfb0`,
+  2761 bytes.
+
+The 9front profile is semantically equal to its historical DTB but has different
+serialized node ordering and therefore different bytes. Linux is a public base,
+not a private launcher DTB; initrd bounds and optional session configuration
+remain runtime derivations. See `et/dts/COMPARISON.md`.
+These are static build/publication checks, **not new DT hardware qualification**.
+GitHub reported this release as published and `immutable: false`.
